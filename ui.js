@@ -4,6 +4,7 @@ $(function() {
 
     var foundation = true;
     var toRight;
+    var turning;
 
     var curX;
     var curY;
@@ -33,6 +34,7 @@ $(function() {
         }
     };
 
+    //must begin by adding a row
     addRow();
     addStitch(new Stitch("HDC"));
     addRow();
@@ -46,6 +48,7 @@ $(function() {
 
     //adds proper number of blank arrays to next row
     //returns # of nodes in next row
+    /*
     function setNextRowNodes(curRow) {
         var lengthNodes = rows[curRow].reduce(function(a, b) {
             return a.concat(b);
@@ -64,7 +67,8 @@ $(function() {
     }
     function getStitchAtCluster(x, y) {
         return rows[x][y];
-    }
+    }*/
+
     function addStitch(stitch) {
         addNode(stitch);
 
@@ -75,14 +79,43 @@ $(function() {
         curY++;
     }
     function addNode(stitch) {
+        """Node convention
+        addNode will give stitch references to 4 nodes using stitch.nodes object
+
+        Node[0] of a stitch will always refer to the upper node of a stitch furthest from the next stitch. Node[1]
+        is the upper node of a stitch adjacent to next stitch. Node[2] is below this. Node[3] is below node[0].
+        If stitch is added while crocheting to right, node[0] refers to upper left corner. All following nodes are
+        added in clockwise direction.
+        If "" to left, node[0 ]refers to upper right corner. "" are added in counterclockwise direction.
+        Every node will have reference to 4 stitches in node.stitches. Node's stitches[0] is previous stitch in row with same number as node,
+        stitches[1] is next stitch, node.stitches[2] as next stitch in previous row, node.stitches[3] as previous stitch in previous row.
+        Nodes at edge will only use stitches[0] and stitches[3]. Nodes in foundation (nodes[0]) will only use stitches[0] and stitches[1].
+
+        """
         if (foundation) {
-            nodes[curX][curY+1] = new Array(nodes[curX][curY][0]+stitch.width, nodes[curX][curY][1]);
+            nodes[curX][curY+1] = new Node(nodes[curX][curY].x+stitch.width, nodes[curX][curY].y);
+            nodes[curX][curY+1].stitches[0] = stitch;
         }
+
         if (toRight) {
-            nodes[curX+1][curY+1] = new Array(nodes[curX][curY][0]+stitch.width, nodes[curX][curY][1]+stitch.height);
+            nodes[curX+1][curY+1] = new Node(nodes[curX][curY].x+stitch.width, nodes[curX][curY].y+stitch.height);
         } else {
-            nodes[curX+1][curY+1] = new Array(nodes[curX][curY][0]0-stitch.width, nodes[curX][curY][1]+stitch.height);
+            nodes[curX+1][curY+1] = new Node(nodes[curX][curY].x-stitch.width, nodes[curX][curY].y+stitch.height);
         }
+
+        if (turning) {
+            turning = false;
+            nodes[curX+1][curY] = new Node(nodes[curX][curY].x, nodes[curX][curY].y+stitch.height);
+            nodes[curX][curY];
+        }
+
+        stitch.nodes[0] = nodes[curX+1][curY];
+        stitch.nodes[1] = nodes[curX+1][curY+1];
+        stitch.nodes[2] = nodes[curX][curY+1];
+        stitch.nodes[3] = nodes[curX][curY];
+
+
+
     }
 
     function addRow() {
@@ -92,7 +125,7 @@ $(function() {
             toRight = !toRight;
         } else {
             nodes[0] = {
-                0:new Array($("#container").width()/2, $("#container").height()/2)
+                0:new Node($("#container").width()/2, $("#container").height()/2)
             };
             curX = 0;
             toRight = true;
@@ -105,6 +138,7 @@ $(function() {
         nodes[curX+1] = {
             0:new Array(2)
         };
+        turning = true;
 
     }
     function addCluster() {
@@ -116,6 +150,17 @@ $(function() {
         addCluster();
     }
 
+    function Node(x, y) {
+        this.x = x;
+        this.y = y;
+        this.stitches = {};
+        this.stitches[0];
+        this.stitches[1];
+        this.stitches[2];
+        this.stitches[3];
+
+    }
+
     function Stitch(stitch) {
         this.stitch = stitch;
         this.x;
@@ -123,6 +168,11 @@ $(function() {
         this.cluster;
         this.width = STITCH_IMGS[this.stitch]["WIDTH"];
         this.height = STITCH_IMGS[this.stitch]["HEIGHT"];
+        this.nodes = {};
+        this.nodes[0];
+        this.nodes[1];
+        this.nodes[2];
+        this.nodes[3];
 
 
         //pos[stX][stY] = [0,0];
