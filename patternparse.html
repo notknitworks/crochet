@@ -1,0 +1,91 @@
+<html>
+<head>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js"></script>
+	<script src="patternparse.js"></script>
+</head>
+
+<body>
+	<table>
+		<tr>
+			<td>Keywords Supported</td>
+			<td>Longform</td>
+			<td>Our Output</td>
+		</tr>
+		<tr>
+			<td>ch x, chain x</td>
+			<td>chain x number of stiches; defaults to 1</td>
+			<td>ch x</td>
+		</tr>
+		<tr>
+			<td>x dtr, x dbl tr</td>
+			<td>x double triple crochets, x double treble crochet; defaults to 1</td>
+			<td>dtr</td>
+		</tr>
+		<tr>
+			<td>x hdc</td>
+			<td>x half double crochet; defaults to 1</td>
+			<td>x hdc</td>
+		</tr>
+		<tr>
+			<td>x htr</td>
+			<td>x half triple crochets; defaults to 1</td>
+			<td>x htr</td>
+		</tr>
+		<tr>
+			<td>x sc</td>
+			<td>x single crochet; defaults to 1</td>
+			<td>x sc</td>
+		</tr>
+		<tr>
+			<td>sk x</td>
+			<td>skip x number of stiches; defaults to 1</td>
+			<td>sk 1</td>
+		</tr>
+		<tr>
+			<td>x tr</td>
+			<td>x triple crochets, x treble crochets</td>
+			<td>x tr</td>
+		</tr>
+		<tr>
+			<td>x times</td>
+			<td>repeat previous (or what was in parenthesis) x times</td>
+			<td>x times</td>
+		</tr>
+		<tr>
+			<td>[stitch] dec, [stitch] decrease</td>
+			<td>do [stitch] to decrease the next two stiches into one</td>
+			<td>[stitch] dec</td>
+		</tr>
+		<tr>
+			<td>[stitch] inc, [stitch] increase</td>
+			<td>do [stitch] to increase the next stitch into two</td>
+			<td>[stitch] inc</td>
+		</tr>
+		<tr>
+			<td>turn, tn</td>
+			<td>turn (used after ch for as in "ch 8 turn")</td>
+			<td>turn</td>
+		</tr>
+		<tr>
+			<td>rep row x, repeat row x</td>
+			<td>repeat the xth row</td>
+			<td>rep row x</td>
+		</tr>
+	</table>
+
+	<h1>Enter pattern here</h1>
+	<table id="patternTable">
+		<tr>
+			<td>Foundation:</td>
+			<td><input type="text" name="r0" value="ch "></input><td>
+			<td><button type="button" id="newRow">Add Row</button></td>
+			<td id="feedback"></td>
+		</tr>
+	</table>
+	
+	<button type="button" id="convert">Convert</button>
+	<div id="output"></div>
+
+</body>
+
+</html>
