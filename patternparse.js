@@ -8,9 +8,9 @@ $(document).ready(function(){
 		if(success){
 			notifyError("");
 			numRows ++;
-			createNextRow();	
+			createNextRow();
 		}
-		
+
 	});
 });
 
@@ -58,7 +58,7 @@ function notifyError(message){
 }
 
 function createNextRow(){
-	$nextRow = $('<tr><td>Row' +  numRows + ':</td>' + 
+	$nextRow = $('<tr><td>Row' +  numRows + ':</td>' +
 			'<td><input type="text" name="r' + numRows + '"></input><td></tr>');
 	$("#patternTable").append($nextRow);
 	$nextRow.append($("#newRow"));

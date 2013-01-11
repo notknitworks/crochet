@@ -93,20 +93,13 @@ $(function() {
 
         """
         if (foundation) {
-            nodes[curX][curY+1] = new Node(nodes[curX][curY].x+stitch.width, nodes[curX][curY].y);
-            nodes[curX][curY+1].stitches[0] = stitch;
+            nodes[curX][curY+1] = new Node(nodes[curX][curY].posX+stitch.width, nodes[curX][curY].posY, curX, curY+1);
         }
 
         if (toRight) {
-            nodes[curX+1][curY+1] = new Node(nodes[curX][curY].x+stitch.width, nodes[curX][curY].y+stitch.height);
+            nodes[curX+1][curY+1] = new Node(nodes[curX][curY].posX+stitch.width, nodes[curX][curY].posY+stitch.height, curX+1, curY+1);
         } else {
-            nodes[curX+1][curY+1] = new Node(nodes[curX][curY].x-stitch.width, nodes[curX][curY].y+stitch.height);
-        }
-
-        if (turning) {
-            turning = false;
-            nodes[curX+1][curY] = new Node(nodes[curX][curY].x, nodes[curX][curY].y+stitch.height);
-            nodes[curX][curY];
+            nodes[curX+1][curY+1] = new Node(nodes[curX][curY].posX-stitch.width, nodes[curX][curY].posY+stitch.height, curX+1, curY+1);
         }
 
         stitch.nodes[0] = nodes[curX+1][curY];
@@ -114,7 +107,10 @@ $(function() {
         stitch.nodes[2] = nodes[curX][curY+1];
         stitch.nodes[3] = nodes[curX][curY];
 
-
+        nodes[curX][curY+1].stitches[0] = stitch;
+        nodes[curX][curY].stitches[1] = stitch;
+        nodes[curX+1][curY+1].stitches[2] = stitch;
+        nodes[curX+1][curY].stitches[3] = stitch;
 
     }
 
@@ -125,22 +121,26 @@ $(function() {
             toRight = !toRight;
         } else {
             nodes[0] = {
-                0:new Node($("#container").width()/2, $("#container").height()/2)
+                0:new Node($("#container").width()/2, $("#container").height()/2, 0, 0)
             };
             curX = 0;
             toRight = true;
         }
+
+        //add corner node
+        nodes[curX+1] = {
+            0 : new Node(nodes[curX][curY].posX, nodes[curX][curY].posY+stitch.height, curX+1, 0)
+        };
+        nodes[curX+1][0].stitches[2] = stitch;
+
         curCluster = 0;
         curY = 0;
         rows[curX] = {
             0:new Array()
         };
-        nodes[curX+1] = {
-            0:new Array(2)
-        };
-        turning = true;
 
     }
+
     function addCluster() {
         curCluster++;
         rows[curX][curCluster] = new Array();
@@ -150,9 +150,39 @@ $(function() {
         addCluster();
     }
 
-    function Node(x, y) {
+    //takes in three nodes (vertex, left, right) to determine vertex's position and adjacent
+    //stitches' angles
+    //side a is opposite anglePrev, side b is opposite angleNext
+    function triangleNodes(node, nodePrev, nodeNext) {
+        var a = node.stitches[3].height;
+        var b = node.stitches[2].height;
+        var c = Math.sqrt(Math.pow(nodeNext.posX - nodePrev.posX, 2) +
+            Math.pow(nodeNext.posY - nodePrev.posY), 2));
+
+        var angleSlant = Math.atan((nodeNext.posY - nodePrev.posY) /
+            (nodeNext.posX - nodePrev.posX));
+
+        var anglePrev = Math.acos((Math.pow(b, 2) + Math.pow(c, 2) - Math.pow(a, 2))/(2*b*c));
+        var angleNext = Math.acos((Math.pow(a, 2) + Math.pow(c, 2) - Math.pow(a, 2))/(2*a*c));
+
+        //need to check logic for whether or not toRight!!!
+        node.stitches[3].angle = anglePrev + angleSlant;
+        node.stitches[2].angle = Math.PI/2 - (angleNext - angleSlant);
+
+        node.posX = nodePrev.posX + b * Math.cos(anglePrev) * Math.cos(angleSlant) -
+            h * Math.sin(angleSlant);
+        node.posY = nodePrev.posY + b * Math.cos(anglePrev) * Math.sin(angleSlant) +
+            h * Math.cos(angleSlant);
+
+       return {anglePrev, angleNext};
+
+    }
+
+    function Node(posX, posY, x, y) {
         this.x = x;
         this.y = y;
+        this.posX = posX;
+        this.posY = posY;
         this.stitches = {};
         this.stitches[0];
         this.stitches[1];
@@ -173,6 +203,7 @@ $(function() {
         this.nodes[1];
         this.nodes[2];
         this.nodes[3];
+        this.angle = 0;
 
 
         //pos[stX][stY] = [0,0];
