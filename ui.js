@@ -37,12 +37,18 @@ $(function() {
     //must begin by adding a row
     addRow();
     addStitch(new Stitch("HDC"));
+    addCluster();
+    addStitch(new Stitch("HDC"));
+    addCluster();
+    addStitch(new Stitch("HDC"));
+    addRow();
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
     addRow();
     addStitch(new Stitch("HDC"));
     addCluster();
     addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    skipStitch();
     addStitch(new Stitch("HDC"));
 
 
@@ -69,6 +75,33 @@ $(function() {
         return rows[x][y];
     }*/
 
+    function getRowStitchesLength(row) {
+        if (typeof curX == "undefined") {
+            //if no stitches have been added yet, there is no last stitch in row
+            return null;
+        } else {
+            return rows[row]['stitches'];
+        }
+    }
+    function getRowClustersLength(row) {
+        if (typeof curX == "undefined") {
+            //if no stitches have been added yet, there is no last stitch in row
+            return null;
+        } else {
+            return rows[row]['clusters'];
+        }
+    }
+    function getNodeInPrev(row, i) {
+        /*
+        Returns node directly underneath node of x = row + 1 and cluster = i
+        */
+        if (!foundation) {
+            return nodes[row][rows[row - 1]['stitches'] - i];
+        } else {
+            return nodes[row][i];
+        }
+    }
+
     function addStitch(stitch) {
         addNode(stitch);
 
@@ -77,9 +110,12 @@ $(function() {
         stitch.y = curY;
         stitch.cluster = curCluster;
         curY++;
+        rows[curX]['stitches'] = curY;
+
     }
     function addNode(stitch) {
-        """Node convention
+        /*Node convention
+
         addNode will give stitch references to 4 nodes using stitch.nodes object
 
         Node[0] of a stitch will always refer to the upper node of a stitch furthest from the next stitch. Node[1]
@@ -91,35 +127,55 @@ $(function() {
         stitches[1] is next stitch, node.stitches[2] as next stitch in previous row, node.stitches[3] as previous stitch in previous row.
         Nodes at edge will only use stitches[0] and stitches[3]. Nodes in foundation (nodes[0]) will only use stitches[0] and stitches[1].
 
-        """
+        */
+
         if (foundation) {
-            nodes[curX][curY+1] = new Node(nodes[curX][curY].posX+stitch.width, nodes[curX][curY].posY, curX, curY+1);
+            nodes[curX][curY+1] = new Node(parseInt(nodes[curX][curY].posX)+parseInt(stitch.width),
+                nodes[curX][curY].posY, curX, curY+1);
+        }
+
+        if (turning) {
+            //add corner nodeh
+            nodes[curX+1] = {
+                0 : new Node(nodes[curX][curY].posX, parseInt(nodes[curX][curY].posY)+parseInt(stitch.height),
+                    curX+1, 0)
+            };
+            turning = false;
         }
 
         if (toRight) {
-            nodes[curX+1][curY+1] = new Node(nodes[curX][curY].posX+stitch.width, nodes[curX][curY].posY+stitch.height, curX+1, curY+1);
+            nodes[curX+1][curY+1] = new Node(parseInt(nodes[curX][curY].posX)+parseInt(stitch.width),
+                parseInt(nodes[curX][curY].posY)+parseInt(stitch.height), curX+1, curY+1);
         } else {
-            nodes[curX+1][curY+1] = new Node(nodes[curX][curY].posX-stitch.width, nodes[curX][curY].posY+stitch.height, curX+1, curY+1);
+            nodes[curX+1][curY+1] = new Node(parseInt(nodes[curX][curY].posX)-parseInt(stitch.width),
+                parseInt(nodes[curX][curY].posY)+parseInt(stitch.height), curX+1, curY+1);
         }
 
         stitch.nodes[0] = nodes[curX+1][curY];
         stitch.nodes[1] = nodes[curX+1][curY+1];
-        stitch.nodes[2] = nodes[curX][curY+1];
-        stitch.nodes[3] = nodes[curX][curY];
+        stitch.nodes[2] = getNodeInPrev(curX, curCluster+1);
+        stitch.nodes[3] = getNodeInPrev(curX, curCluster);
+        // stitch.nodes[2] = nodes[curX][curY+1];
+        // stitch.nodes[3] = nodes[curX][curY];
 
-        nodes[curX][curY+1].stitches[0] = stitch;
-        nodes[curX][curY].stitches[1] = stitch;
+        getNodeInPrev(curX, curCluster+1).stitches[0] = stitch;
+        getNodeInPrev(curX, curCluster).stitches[1] = stitch;
+        //nodes[curX][curY+1].stitches[0] = stitch;
+        //nodes[curX][curY].stitches[1] = stitch;
         nodes[curX+1][curY+1].stitches[2] = stitch;
         nodes[curX+1][curY].stitches[3] = stitch;
 
     }
 
     function addRow() {
-        if (!foundation || curX ==0) {
+        //foundation will not get set to false until second row is added
+        if (typeof curX != "undefined") {
             foundation = false;
+            rows[curX]['clusters']++;
             curX++;
             toRight = !toRight;
         } else {
+            //first node
             nodes[0] = {
                 0:new Node($("#container").width()/2, $("#container").height()/2, 0, 0)
             };
@@ -127,16 +183,14 @@ $(function() {
             toRight = true;
         }
 
-        //add corner node
-        nodes[curX+1] = {
-            0 : new Node(nodes[curX][curY].posX, nodes[curX][curY].posY+stitch.height, curX+1, 0)
-        };
-        nodes[curX+1][0].stitches[2] = stitch;
+        turning = true;
 
         curCluster = 0;
         curY = 0;
         rows[curX] = {
-            0:new Array()
+            0:new Array(),
+            'clusters':0,
+            'stitches':0
         };
 
     }
@@ -144,6 +198,7 @@ $(function() {
     function addCluster() {
         curCluster++;
         rows[curX][curCluster] = new Array();
+        rows[curX]['clusters'] = curCluster;
     }
     function skipStitch() {
         addCluster();
@@ -157,7 +212,7 @@ $(function() {
         var a = node.stitches[3].height;
         var b = node.stitches[2].height;
         var c = Math.sqrt(Math.pow(nodeNext.posX - nodePrev.posX, 2) +
-            Math.pow(nodeNext.posY - nodePrev.posY), 2));
+            Math.pow(nodeNext.posY - nodePrev.posY), 2);
 
         var angleSlant = Math.atan((nodeNext.posY - nodePrev.posY) /
             (nodeNext.posX - nodePrev.posX));
@@ -174,7 +229,7 @@ $(function() {
         node.posY = nodePrev.posY + b * Math.cos(anglePrev) * Math.sin(angleSlant) +
             h * Math.cos(angleSlant);
 
-       return {anglePrev, angleNext};
+       return [anglePrev, angleNext];
 
     }
 
