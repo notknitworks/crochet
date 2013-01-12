@@ -50,31 +50,7 @@ $(function() {
     addCluster();
     addStitch(new Stitch("HDC"));
     addStitch(new Stitch("HDC"));
-
-
-    //adds proper number of blank arrays to next row
-    //returns # of nodes in next row
-    /*
-    function setNextRowNodes(curRow) {
-        var lengthNodes = rows[curRow].reduce(function(a, b) {
-            return a.concat(b);
-        }).length;
-        for (var i=0; i < lengthNodes; i++) {
-            rows[curRow+1].push(new Array());
-        }
-        return lengthNodes
-    }
-
-    //gets stitch (x,y), ignoring what cluster it's in
-    function getStitchAt(x, y) {
-        return rows[x].reduce(function(a,b) {
-            return a.concat(b);
-        })[y];
-    }
-    function getStitchAtCluster(x, y) {
-        return rows[x][y];
-    }*/
-
+/*
     function getRowStitchesLength(row) {
         if (typeof curX == "undefined") {
             //if no stitches have been added yet, there is no last stitch in row
@@ -91,6 +67,8 @@ $(function() {
             return rows[row]['clusters'];
         }
     }
+    */
+
     function getNodeInPrev(row, i) {
         /*
         Returns node directly underneath node of x = row + 1 and cluster = i
@@ -127,6 +105,7 @@ $(function() {
         stitches[1] is next stitch, node.stitches[2] as next stitch in previous row, node.stitches[3] as previous stitch in previous row.
         Nodes at edge will only use stitches[0] and stitches[3]. Nodes in foundation (nodes[0]) will only use stitches[0] and stitches[1].
 
+        Stitches in same cluster will originally have nodes positioned directly on top of each other
         */
 
         if (foundation) {
@@ -135,33 +114,30 @@ $(function() {
         }
 
         if (turning) {
-            //add corner nodeh
+            //add corner node
             nodes[curX+1] = {
-                0 : new Node(nodes[curX][curY].posX, parseInt(nodes[curX][curY].posY)+parseInt(stitch.height),
+                0 : new Node(getNodeInPrev(curX, curCluster).posX,
+                    parseInt(getNodeInPrev(curX, curCluster).posY)+parseInt(stitch.height),
                     curX+1, 0)
             };
             turning = false;
         }
 
         if (toRight) {
-            nodes[curX+1][curY+1] = new Node(parseInt(nodes[curX][curY].posX)+parseInt(stitch.width),
-                parseInt(nodes[curX][curY].posY)+parseInt(stitch.height), curX+1, curY+1);
+            nodes[curX+1][curY+1] = new Node(parseInt(getNodeInPrev(curX, curCluster).posX)+parseInt(stitch.width),
+                parseInt(getNodeInPrev(curX, curCluster).posY)+parseInt(stitch.height), curX+1, curY+1);
         } else {
-            nodes[curX+1][curY+1] = new Node(parseInt(nodes[curX][curY].posX)-parseInt(stitch.width),
-                parseInt(nodes[curX][curY].posY)+parseInt(stitch.height), curX+1, curY+1);
+            nodes[curX+1][curY+1] = new Node(parseInt(getNodeInPrev(curX, curCluster).posX)-parseInt(stitch.width),
+                parseInt(getNodeInPrev(curX, curCluster).posY)+parseInt(stitch.height), curX+1, curY+1);
         }
 
         stitch.nodes[0] = nodes[curX+1][curY];
         stitch.nodes[1] = nodes[curX+1][curY+1];
         stitch.nodes[2] = getNodeInPrev(curX, curCluster+1);
         stitch.nodes[3] = getNodeInPrev(curX, curCluster);
-        // stitch.nodes[2] = nodes[curX][curY+1];
-        // stitch.nodes[3] = nodes[curX][curY];
 
         getNodeInPrev(curX, curCluster+1).stitches[0] = stitch;
         getNodeInPrev(curX, curCluster).stitches[1] = stitch;
-        //nodes[curX][curY+1].stitches[0] = stitch;
-        //nodes[curX][curY].stitches[1] = stitch;
         nodes[curX+1][curY+1].stitches[2] = stitch;
         nodes[curX+1][curY].stitches[3] = stitch;
 
@@ -260,6 +236,12 @@ $(function() {
         this.nodes[3];
         this.angle = 0;
 
+        this.place = place;
+
+        function place() {
+
+        }
+
 
         //pos[stX][stY] = [0,0];
         //angles[stX][stY] = 0;
@@ -307,8 +289,27 @@ $(function() {
         */
     }
 
+
+//DEBUGGING METHODS
 console.log("yay");    //stitch.addToCanvas(45);
 
+for (node in nodes) {
+    printNodesInRow(node);
+}
+
+
+
+//HELPER FUNCTIONS FOR DEBUGGING
+function printStitchesAtNode(x,y) {
+    for (stitch in nodes[x][y].stitches) {
+        console.log(stitch + " : ("+nodes[x][y].stitches[stitch].x + ", "+nodes[x][y].stitches[stitch].y + ")");
+    }
+}
+function printNodesInRow(row) {
+    console.log("printing nodes for row "+row);
+    for (node in nodes[row]) {
+        console.log("node "+node+": (" + nodes[row][node].posX + ", " + nodes[row][node].posY + ")");
+    }
+}
 
 });
-
