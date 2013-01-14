@@ -186,32 +186,36 @@ $(function() {
 
     //takes in three nodes (vertex, left, right) to determine vertex's position and adjacent
     //stitches' angles, legs a and b of triangle
-    //side a is opposite angleA, side b is opposite angleB
-    function triangleNodes(node, nodePrev, nodeNext, a, b) {
-        //var a = node.stitches[3].height;
-        //var b = node.stitches[2].height;
-        var c = distance(nodeNext, nodePrev);
+    // //side a is opposite angleA, side b is opposite angleB
+    // function triangleNodes(node, nodePrev, nodeNext, a, b) {
+    //     //var a = node.stitches[3].height;
+    //     //var b = node.stitches[2].height;
+    //     var c = distance(nodeNext, nodePrev);
 
-        var angleSlant = Math.atan((nodeNext.posY - nodePrev.posY) /
-            (nodeNext.posX - nodePrev.posX));
+    //     var angleSlant = Math.atan((nodeNext.posY - nodePrev.posY) /
+    //         (nodeNext.posX - nodePrev.posX));
 
-        var angleA = Math.acos((Math.pow(b, 2) + Math.pow(c, 2) - Math.pow(a, 2))/(2*b*c));
-        var angleB = Math.acos((Math.pow(a, 2) + Math.pow(c, 2) - Math.pow(a, 2))/(2*a*c));
+    //     var angleA = Math.acos((Math.pow(b, 2) + Math.pow(c, 2) - Math.pow(a, 2))/(2*b*c));
+    //     var angleB = Math.acos((Math.pow(a, 2) + Math.pow(c, 2) - Math.pow(a, 2))/(2*a*c));
 
-        /*need to check logic for whether or not toRight!!!
-        node.stitches[3].angle = angleA + angleSlant;
-        node.stitches[2].angle = Math.PI/2 - (angleB - angleSlant);*/
+    //     /*need to check logic for whether or not toRight!!!
+    //     node.stitches[3].angle = angleA + angleSlant;
+    //     node.stitches[2].angle = Math.PI/2 - (angleB - angleSlant);*/
 
-        node.posX = nodePrev.posX + b * Math.cos(angleA) * Math.cos(angleSlant) -
-            h * Math.sin(angleSlant);
-        node.posY = nodePrev.posY + b * Math.cos(angleA) * Math.sin(angleSlant) +
-            h * Math.cos(angleSlant);
+    //     node.posX = nodePrev.posX + b * Math.cos(angleA) * Math.cos(angleSlant) -
+    //         h * Math.sin(angleSlant);
+    //     node.posY = nodePrev.posY + b * Math.cos(angleA) * Math.sin(angleSlant) +
+    //         h * Math.cos(angleSlant);
 
-       return [angleA, angleB];
+    //    return [angleA, angleB];
 
-    }
+    // }
 
     function positionCluster(cluster) {
+        /**
+        *Basic positioning for a cluster. Assuming first stitch is correctly placed,
+        *rotate others in cluster until aligned with each other.
+        */
         var start = cluster[0].nodes[0];
         for (var i=1; i < cluster.length; i++) {
             var stitch = cluster[i];
@@ -223,9 +227,36 @@ $(function() {
     }
 
     function alignNodes(node1, node2) {
+        /**
+        *Set node1 to node2's position
+        */
         node1.posX = node2.posX;
         node1.posY = node2.posY;
     }
+    function rotateStitch(stitch, angle) {
+        var origin = midpoint(stitch.nodes[2], stitch.nodes[3]);
+
+        for (node in stitch.nodes) {
+            rotateNode(stitch.nodes[node], origin, angle);
+        }
+        stitch.place();
+    }
+    function rotateNode(node, origin, angle) {
+        var a = distance(node, origin);
+        var theta1 = Math.atan( (node.posX - origin.posX) / (node.posY - origin.posY) );
+        var theta2 = Math.PI/2 - theta1 - angle;
+
+        node.posX = origin.posX + a * Math.cos(theta2);
+        node.posY = origin.posY + a * Math.sin(theta2);
+    }
+
+    function getAngleFromSides(a, b, c) {
+        return Math.acos((Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2*a*b));
+    }
+    function getSideFromAngle(a, b, angleC) {
+        return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2) - 2*a*b*Math.cos(angleC));
+    }
+
 
     function Node(posX, posY, x, y) {
         this.x = x;
@@ -244,6 +275,8 @@ $(function() {
         this.stitch = stitch;
         this.x;
         this.y;
+        this.posX;
+        this.posY;
         this.cluster;
         this.width = STITCH_IMGS[this.stitch]["WIDTH"];
         this.height = STITCH_IMGS[this.stitch]["HEIGHT"];
@@ -262,18 +295,16 @@ $(function() {
                 "height":self.height,
                 "border":"solid gray 1px",
                 "background-color":"gray",
-                "opacity":"0.5"
-                //"background-image":"url('"+STITCH_IMGS[self.stitch]["SRC"]+"')",
-                //"background-size":"cover",
-                /*"-webkit-transform": "rotate("+self.angle+"deg)",
-                 "-moz-transform": "rotate("+self.angle+"deg)",
-                  "-ms-transform": "rotate("+self.angle+"deg)",
-                   "-o-transform": "rotate("+self.angle+"deg)",
-                      "transform": "rotate("+self.angle+"deg)"*/
+                "opacity":"0.5",
+                "transform-origin":"50% 100%",
+                "-ms-transform-origin":"50% 100%", /* IE 9 */
+                "-webkit-transform-origin":"50% 100%", /* Safari and Chrome */
+                "-moz-transform-origin":"50% 100%", /* Firefox */
+                "-o-transform-origin":"50% 100%", /* Opera */
         });
 
         this.place = place;
-        this.setPos = setPos;
+        this.addToCanvas = addToCanvas;
 
         //call this function to position stitch once all nodes are in place
         function place() {
@@ -290,37 +321,41 @@ $(function() {
              var m2 = (pt1.posY - pt3.posY) / (pt1.posX - pt3.posX);
              var b2 = -m2 * pt1.posX + pt1.posY;
 
-             var ctrX;
-             var ctrY;
              if (m1==Infinity) {
-                ctrX = pt0.posX;
-                ctrY = m2*ctrX + b2;
+                this.posX = pt0.posX;
+                this.posY = m2*this.posX + b2;
              } else if (m2==Infinity) {
-                ctrX = pt1.posY;
-                ctrY = m1*ctrX + b1;
+                this.posX = pt1.posY;
+                this.posY = m1*this.posX + b1;
              } else if (isNaN(m1)) {
-                ctrX = pt0.posX;
-                ctrY = pt0.posY;
+                this.posX = pt0.posX;
+                this.posY = pt0.posY;
             } else if (isNaN(m2)) {
-                ctrX = pt1.posX;
-                ctrY = pt1.posY;
+                this.posX = pt1.posX;
+                this.posY = pt1.posY;
             } else {
-                ctrX = (b1 - b2) / (-m1 + m2);
-                ctrY = (m2*b1 - m1*b2) / (-m1 + m2);
+                this.posX = (b1 - b2) / (-m1 + m2);
+                this.posY = (m2*b1 - m1*b2) / (-m1 + m2);
              }
-            this.setPos(ctrX, ctrY);
+            this.addToCanvas();
 
             console.log("adding stitch (" + this.x +", " + this.y+") "+
-             "to canvas at ("+ctrX+", "+ctrY+")");
+             "to canvas at ("+this.posX+", "+this.posY+")");
 
         }
 
-        function setPos(ctrX, ctrY) {
-            this.top = 600 - (ctrY + this.height);
-            this.left = ctrX - this.width/2;
+        function addToCanvas() {
+            this.top = 600 - (this.posY + this.height);
+            this.left = this.posX - this.width/2;
             var self = this;
             this.div.css({"top":self.top,
-                "left":self.left});
+                "left":self.left,
+                "transform": "rotate("+self.angle*180/Math.PI+"deg)",
+                "-ms-transform": "rotate("+self.angle*180/Math.PI+"deg)", /* IE 9 */
+                "-webkit-transform": "rotate("+self.angle*180/Math.PI+"deg)", /* Safari and Chrome */
+                "-moz-transform": "rotate("+self.angle*180/Math.PI+"deg)", /* Firefox */
+                "-o-transform": "rotate("+self.angle*180/Math.PI+"deg)" /* Opera */
+            });
 
             $("#container").append(this.div);
 
@@ -329,7 +364,7 @@ $(function() {
         //pos[stX][stY] = [0,0];
         //angles[stX][stY] = 0;
 /*
-        this.setPos = setPos;
+        this.addToCanvas = addToCanvas;
         this.setAngle = setAngle;
         this.addToCanvas = addToCanvas;
 
@@ -398,7 +433,7 @@ function printNodesAtStitch(stitch) {
 
 function distance(node1, node2) {
     return Math.sqrt(Math.pow(node1.posX - node2.posX, 2) +
-            Math.pow(node1.posY - node2.posY), 2);
+            Math.pow(node1.posY - node2.posY, 2));
 }
 
 function midpoint(node1, node2) {
