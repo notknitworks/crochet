@@ -39,16 +39,45 @@ $(function() {
     addStitch(new Stitch("HDC"));
     addStitch(new Stitch("HDC"));
     addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
     addRow();
     addStitch(new Stitch("HDC"));
-    addCluster();
+        skipStitch();
+
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    skipStitch();
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    skipStitch();
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    skipStitch();
+    addStitch(new Stitch("HDC"));
     addStitch(new Stitch("HDC"));
     addRow();
     addStitch(new Stitch("HDC"));
     addStitch(new Stitch("HDC"));
+    skipStitch();
     addStitch(new Stitch("HDC"));
-    addCluster();
     addStitch(new Stitch("HDC"));
+    skipStitch();
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    skipStitch();
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    skipStitch();
+    addStitch(new Stitch("HDC"));
+
+
 
     function getNodeInPrev(row, i) {
         /*
@@ -72,21 +101,40 @@ $(function() {
         var originStitch = rows[curX][curCluster][0];
         var origin = midpoint(originStitch.nodes[3], originStitch.nodes[2]);
         stitch.top = origin.posY + stitch.height;
-        stitch.left = origin.posX;
+        stitch.left = origin.posX - stitch.width/2;
 
-        var topLeft = makeNodeAt(stitch.nodes[3]);
-        topLeft.posY += stitch.height;
-        var distancePrev = distance(stitch.nodes[0], topLeft);
-        var angle = getAngleFromSides(stitch.height, stitch.height, distancePrev);
-        if (!toRight) {
-            angle = 2*Math.PI - angle;
-        }
-        if (rows[curX][curCluster][0] == stitch) {
-            stitch.angle = angle;
+        if (rows[curX][curCluster][0] == stitch && curCluster!=0) {
+
+            var prevStitch = stitch.nodes[0].stitches[2]
+            var midpt2 = midpoint(prevStitch.nodes[2], prevStitch.nodes[3]);
+            var base = distance(origin, midpt2);
+            var curLeg = Math.sqrt(Math.pow(stitch.height,2) + Math.pow(stitch.width/2, 2));
+            var prevLeg = Math.sqrt(Math.pow(prevStitch.height,2) + Math.pow(prevStitch.width/2, 2));
+            var curAngle = getAngleFromSides(base, curLeg, prevLeg);
+            var prevAngle = getAngleFromSides(base, prevLeg, curLeg);
+            var slant = Math.atan((origin.posY - midpt2.posY) / (origin.posX - midpt2.posX) );
+
+            var angleBefore = getAngleFromSides(prevStitch.height, rows[prevStitch.x][prevStitch.cluster][0].height,
+                distance(midpoint(prevStitch.nodes[0], prevStitch.nodes[1]),
+                    midpoint(rows[prevStitch.x][prevStitch.cluster][0].nodes[0], rows[prevStitch.x][prevStitch.cluster][0].nodes[1])));
+            var maxAngle = getAngleFromSides(distance(midpt2, origin), rows[prevStitch.x][prevStitch.cluster][0].height,
+                    distance(midpoint(rows[prevStitch.x][prevStitch.cluster][0].nodes[0], rows[prevStitch.x][prevStitch.cluster][0].nodes[1]), origin));
+
+            var angleAfter = maxAngle - prevAngle - Math.atan(prevStitch.width/2 / prevStitch.height);
+            rotateStitch(stitch, origin, -Math.PI/2 + (curAngle + Math.atan(prevStitch.width/2 / prevStitch.height)));
+            rotateStitchesInCluster(prevStitch.x, prevStitch.cluster, (angleAfter - angleBefore));
+
+
         } else {
-            stitch.angle = stitch.nodes[0].stitches[2].angle + angle;
+            var topLeft = makeNodeAt(stitch.nodes[3]);
+            topLeft.posY += stitch.height;
+            var distancePrev = distance(stitch.nodes[0], topLeft);
+            var angle = getAngleFromSides(stitch.height, stitch.height, distancePrev);
+            if (stitch.nodes[3].posX > stitch.nodes[0].posX && toRight) {
+                angle = -angle;
+            }
+            rotateStitch(stitch, origin, angle);
         }
-
         curY++;
         rows[curX]['stitches'] = curY;
 
@@ -130,13 +178,15 @@ $(function() {
             turning = false;
         }
 
+        var origin = midpoint(getNodeInPrev(curX, curCluster), getNodeInPrev(curX, curCluster+1));
+        var offset;
         if (toRight) {
-            nodes[curX+1][curY+1] = new Node(getNodeInPrev(curX, curCluster+1).posX,
-                getNodeInPrev(curX, curCluster+1).posY+stitch.height, curX+1, curY+1);
+            offset = stitch.width/2;
         } else {
-            nodes[curX+1][curY+1] = new Node(getNodeInPrev(curX, curCluster+1).posX,
-                getNodeInPrev(curX, curCluster+1).posY+stitch.height, curX+1, curY+1);
+            offset = -stitch.width/2;
         }
+        nodes[curX+1][curY+1] = new Node(origin.posX + offset,
+                origin.posY+stitch.height, curX+1, curY+1);
 
         stitch.nodes[0] = nodes[curX+1][curY];
         stitch.nodes[1] = nodes[curX+1][curY+1];
@@ -196,29 +246,41 @@ $(function() {
         addCluster();
     }
 
-    // function positionCluster(cluster) {
-    //     /**
-    //     *Basic positioning for a cluster. Assuming first stitch is correctly placed,
-    //     *rotate others in cluster until aligned with each other.
-    //     */
-    //     var start = cluster[0].nodes[0];
-    //     for (var i=1; i < cluster.length; i++) {
-    //         var stitch = cluster[i];
-    //         var prevStitch = cluster[i-1];
-    //         alignNodes(stitch.nodes[0], prevStitch.nodes[1]);
-    //         alignNodes(stitch.nodes[2], prevStitch.nodes[2]);
-    //         alignNodes(stitch.nodes[3], prevStitch.nodes[3]);
-    //     }
-    // }
-
-    function rotateStitch(stitch, angle) {
-        var origin = midpoint(stitch.nodes[2], stitch.nodes[3]);
-
-        for (node in stitch.nodes) {
-            rotateNode(stitch.nodes[node], origin, angle);
+    function rotateStitch(stitch, origin, angle) {
+        if (!toRight) {
+            angle = -angle;
         }
         stitch.angle += angle;
+        rotateNode(stitch.nodes[1], origin, angle);
+        if (stitch.y == 0) {
+            rotateNode(stitch.nodes[0], origin, angle);
+        }
+        stitch.addToCanvas();
     }
+    // function rotateStitchToAngle(stitch, origin, angle) {
+    //     if (!toRight) {
+    //         angle = -angle;
+    //     }
+    //     stitch.angle = angle;
+    //     rotateNode(stitch.nodes[1], origin, angle);
+    //     if (stitch.y == 0) {
+    //         rotateNode(stitch.nodes[0], origin, angle);
+    //     }
+    // }
+    function rotateStitchesInCluster(row, clusterNum, angle) {
+        var cluster = rows[row][clusterNum];
+        var origin = midpoint(cluster[0].nodes[2], cluster[0].nodes[3]);
+        if (clusterNum == 0) {
+            for (stitch in cluster) {
+                rotateStitch(cluster[stitch], origin, angle);
+            }
+        } else {
+            for (stitch in cluster) {
+                rotateStitch(cluster[stitch], origin, angle / (cluster.length * (cluster.length + 1)/2) * stitch);
+            }
+        }
+    }
+
     function rotateNode(node, origin, angle) {
         var vectorX = node.posX - origin.posX;
         var vectorY = node.posY - origin.posY;
