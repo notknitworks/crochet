@@ -1,0 +1,45 @@
+.addedStitch
+{
+	margin: 3px;
+	padding: 5px;
+	-moz-border-radius: 7px;
+	border-radius: 7px;
+	height: 20px;
+	z-index: 1;
+	line-height: 20px;
+	/*position: relative;
+	top: 15px;*/
+
+}
+.addedStitch span:first-child
+{
+	padding-left: 5px;
+	
+}
+.addedStitch span:last-child
+{
+	padding-right: 5px;
+	padding-left: 15px;
+}
+.right
+{
+	background-color:#59D659;
+}
+.wrong
+{
+	background-color:#8F0E0E;
+	color: white;
+}
+input
+{
+	border:none;
+}
+.edit
+{
+	width: 500px;
+	height: 40px;
+	border: 1px solid black;
+	display: table-cell;
+	vertical-align: middle;
+	z-index: 0;
+}
