@@ -8,7 +8,7 @@ from crochetDev.views import homePage, hello
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'crochetDev.views.home', name='home'),
-    (r'^/$', homePage),
+    (r'^$', homePage),
     (r'^hello/$', hello),
     # url(r'^crochetDev/', include('crochetDev.foo.urls')),
 
