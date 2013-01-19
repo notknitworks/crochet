@@ -14,17 +14,17 @@ $(function() {
     var rounds = false;
     var STITCH_IMGS = {
         CH:{
-            SRC:"http://carlylovesfashion.files.wordpress.com/2012/01/rectangle.gif",
-            WIDTH:0,
-            HEIGHT:0,
+            SRC:"",
+            WIDTH:20,
+            HEIGHT:10,
         },
         SC:{
-            SRC:"http://carlylovesfashion.files.wordpress.com/2012/01/rectangle.gif",
+            SRC:"",
             WIDTH:20,
             HEIGHT:20
         },
         HDC:{
-            SRC:"rectangle.gif",
+            SRC:"",
             WIDTH:20,
             HEIGHT:40
         }
@@ -60,6 +60,7 @@ $(function() {
 
     addRow();
     addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
     skipStitch();
     skipStitch();
     skipStitch();
@@ -88,16 +89,16 @@ $(function() {
     skipStitch();
     skipStitch();
         addStitch(new Stitch("HDC"));
-    addCluster();
+        addChain();
+        addChain();
+        addStitch(new Stitch("HDC"));
 
 
     function addStitch(stitch) {
-        rows[curX]['stitches'] = curY + 1;
+        rows[curX]['stitches']++;
         if (!toRight) {
             stitch.dir *= -1;
         }
-
-        addNode(stitch);
 
         if (curY == 0 && !foundation) {
             stitch.prevStitch = getStitchY(curX-1, rows[curX-1]['stitches']-1);
@@ -106,10 +107,12 @@ $(function() {
         }
 
         rows[curX][curCluster].push(stitch);
+
         stitch.x = curX;
         stitch.y = curY;
         stitch.cluster = curCluster;
 
+        addNode(stitch);
         stitch.top = stitch.origin.posY + stitch.height;
         stitch.left = stitch.origin.posX - stitch.width/2;
 
@@ -156,12 +159,12 @@ $(function() {
             var angle = Math.atan(stitch.width/2 / stitch.height) + Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height);
             rotateStitch(stitch, stitch.origin, angle);
             if (curCluster == 0 && !foundation) {
-                rotateStitchesInCluster(curX, curCluster, Math.atan(stitch.width/2 / stitch.height)*stitch.dir);
+                rotateStitchesInCluster(curX, curCluster, -Math.atan(stitch.width/2 / stitch.height));
             }
 
         }
-        curY++;
 
+        curY++;
         stitch.addToCanvas();
 
         if (foundation) {
@@ -202,10 +205,8 @@ $(function() {
         }
 
         var origin = midpoint(getNodeInPrev(curX, curCluster), getNodeInPrev(curX, curCluster+1));
-        var offset = stitch.width/2;
-        if (!toRight) {
-            offset = -stitch.width/2;
-        }
+        var offset = stitch.width/2 * stitch.dir;
+
         nodes[curX+1][curY+1] = new Node(origin.posX + offset,
                 origin.posY+stitch.height, curX+1, curY+1);
 
@@ -215,6 +216,79 @@ $(function() {
         stitch.nodes[3] = getNodeInPrev(curX, curCluster);
 
         stitch.setOrigin();
+    }
+
+    function addChain() {
+        var chain = new Chain();
+        if (!toRight) {
+            chain.dir *= -1;
+        }
+
+        var curStitch;
+        if (curY == 0) {
+            curStitch = new Stitch("CH");
+            curStitch.prevStitch = getStitchY(curX-1, rows[curX-1]['stitches']-1);
+        } else if (getStitchY(curX, curY - 1).stitch != "CH") {
+            curStitch = new Stitch("CH");
+            curStitch.prevStitch = getStitchY(curX, curY-1);
+        } else {
+            curY--;
+            curStitch = getStitchY(curX, curY);
+        }
+        if (curStitch.chains.length == 0) {
+            rows[curX][curCluster].push(curStitch);
+            rows[curX]['stitches']++;
+            curStitch.height = curStitch.prevStitch.height;
+            addNode(curStitch);
+            curStitch.top = curStitch.nodes[0].posY;
+            curStitch.left = curStitch.nodes[0].posX;
+            curStitch.angle = curStitch.prevStitch.angle;
+            rotateStitch(curStitch, curStitch.origin, curStitch.angle);
+        }
+
+        curStitch.chains.push(chain);
+        chain.stitch = curStitch;
+
+
+        chain.x = curX;
+        chain.y = curY;
+        chain.chIndex = curStitch.chains.length - 1;
+        chain.cluster = curCluster;
+
+
+        // addChNode(curStitch);
+        curY++;
+        // chain.top = chain.origin.posY + chain.height;
+        // chain.left = chain.origin.posX - chain.width/2;
+    }
+    function addChsNodes(stitch) {
+        if (curY==0) {
+            nodes[curX+1] = {
+
+            }
+        }
+        nodes[curX+1][curY+1]
+
+        stitch.nodes[0] = nodes[curX+1][curY];
+        stitch.nodes[1] = nodes[curX+1][curY+1];
+        stitch.nodes[2] = getNodeInPrev(curX, curCluster+1);
+        stitch.nodes[3] = getNodeInPrev(curX, curCluster);
+
+    }
+
+    function addChNode(chain) {
+
+
+        if (stitch.angle > 0) {
+            nodes[curX+1][curY+1] = new Node(nodes[curX][curY].posX + stitchNum * stitch.width * Math.cos(prevAngle)*stitch.dir,
+                nodes[curX][curY].posY - stitchNum * stitch.width * Math.sin(prevAngle));
+        } else {
+            nodes[curX+1][curY+1] = new Node(nodes[curX][curY].posX + stitchNum * stitch.width * Math.cos(prevAngle)*stitch.dir,
+                nodes[curX][curY].posY + stitchNum * stitch.width * Math.sin(prevAngle));
+        }
+
+        stitch.nodes[0] = nodes[curX+1][curY];
+        stitch.nodes[1] = nodes[curX+1][curY+1];
     }
 
     function addRow() {
@@ -349,6 +423,7 @@ $(function() {
     }
 
     function Stitch(stitch) {
+        this.chains = [];
         this.stitch = stitch;
         this.prevStitch = null;
         this.origin;
@@ -356,7 +431,9 @@ $(function() {
         this.y;
         this.cluster;
         this.width = STITCH_IMGS[this.stitch]["WIDTH"];
-        this.height = STITCH_IMGS[this.stitch]["HEIGHT"];
+        if (stitch != "CH") {
+            this.height = STITCH_IMGS[this.stitch]["HEIGHT"];
+        }
         this.nodes = {};
         this.angle = 0;
         this.dir = 1;
@@ -365,16 +442,9 @@ $(function() {
         this.div = $("<div></div>");
         var self = this;
         this.div.css({'position':'absolute',
-                "width":self.width,
-                "height":self.height,
                 "background-color":"gray",
-                "border":"solid gray 1px",
-                "opacity":"0.5",
-                "transform-origin":"50% 100%",
-                "-ms-transform-origin":"50% 100%", /* IE 9 */
-                "-webkit-transform-origin":"50% 100%", /* Safari and Chrome */
-                "-moz-transform-origin":"50% 100%", /* Firefox */
-                "-o-transform-origin":"50% 100%", /* Opera */
+                //"border":"solid gray 1px",
+                "opacity":"0.5"
         });
 
         this.addToCanvas = addToCanvas;
@@ -386,6 +456,8 @@ $(function() {
             var self = this;
             this.div.css({"top":600-self.top,
                 "left":self.left,
+                "width":self.width,
+                "height":self.height,
                 "transform": "rotate("+self.dir*self.angle*180/Math.PI+"deg)",
                 "-ms-transform": "rotate("+self.dir*self.angle*180/Math.PI+"deg)", /* IE 9 */
                 "-webkit-transform": "rotate("+self.dir*self.angle*180/Math.PI+"deg)", /* Safari and Chrome */
@@ -397,9 +469,49 @@ $(function() {
 
         }
         function setOrigin() {
-            this.origin = midpoint(this.nodes[2], this.nodes[3]);
+            if (this.stitch != "CH") {
+                this.origin = midpoint(this.nodes[2], this.nodes[3]);
+                this.div.css({"transform-origin":"50% 100%",
+                    "-ms-transform-origin":"50% 100%", /* IE 9 */
+                    "-webkit-transform-origin":"50% 100%", /* Safari and Chrome */
+                    "-moz-transform-origin":"50% 100%", /* Firefox */
+                    "-o-transform-origin":"50% 100%", /* Opera */
+                });
+            } else {
+                this.origin = this.nodes[0];
+                this.div.css({"transform-origin":"0 0",
+                    "-ms-transform-origin":"0 0", /* IE 9 */
+                    "-webkit-transform-origin":"0 0", /* Safari and Chrome */
+                    "-moz-transform-origin":"0 0", /* Firefox */
+                    "-o-transform-origin":"0 0", /* Opera */
+                });
+            }
         }
 
+    }
+    function Chain() {
+        this.x;
+        this.y;
+        this.cluster;
+        this.chIndex;
+        this.stitch;
+        this.prevChain;
+        this.top;
+        this.left;
+        this.dir = 1;
+        this.angle = 0;
+        this.nodes = {};
+        this.width = STITCH_IMGS["CH"]["WIDTH"];
+        this.height = STITCH_IMGS["CH"]["HEIGHT"];
+        var self = this;
+        this.div = $("<div></div>");
+        this.div.css({'position':'absolute',
+                "width":self.width,
+                "height":self.height,
+                "background-color":"gray",
+                "border":"solid gray 1px",
+                "opacity":"0.5"
+        });
     }
 
 
