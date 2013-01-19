@@ -1,0 +1,19 @@
+<html>
+<head>
+</head>
+
+<body>
+	<h1>Welcome to stitch-it!</h1>
+	<h4>Log in</h4>
+	<h4>Create an account</h4>
+		<form action="" method="post"> {% csrf_token %}
+			<p>Type username:</p>
+			<input type="text" name="username" id="username">
+			<span id="available">{{ available }} </span>
+			<p>Type password:</p>
+			<input type="text" name="password">
+			<input type="submit" value="Create Account">
+		</form>
+	<h4>Stitch without an account</h4>
+</body>
+</html>
