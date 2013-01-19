@@ -4,16 +4,12 @@ $(function() {
 
     var foundation = true;
     var toRight;
-    var turning;
 
     var curX;
     var curY;
     var curCluster;
 
     var rows = {};
-    //var angles = {
-        //0: []
-    //}
     var nodes = {};
     var rounds = false;
     var STITCH_IMGS = {
@@ -24,8 +20,8 @@ $(function() {
         },
         SC:{
             SRC:"http://carlylovesfashion.files.wordpress.com/2012/01/rectangle.gif",
-            WIDTH:2,
-            HEIGHT:5
+            WIDTH:20,
+            HEIGHT:20
         },
         HDC:{
             SRC:"rectangle.gif",
@@ -44,67 +40,56 @@ $(function() {
     addStitch(new Stitch("HDC"));
     addStitch(new Stitch("HDC"));
     addStitch(new Stitch("HDC"));
+
+    // addRow();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+
     addRow();
     addStitch(new Stitch("HDC"));
     skipStitch();
     skipStitch();
     skipStitch();
-
-    addStitch(new Stitch("HDC"));
     addStitch(new Stitch("HDC"));
     addStitch(new Stitch("HDC"));
     addStitch(new Stitch("HDC"));
     addStitch(new Stitch("HDC"));
     skipStitch();
     addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+
+    addRow();
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    skipStitch();
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    skipStitch();
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    skipStitch();
+    skipStitch();
         addStitch(new Stitch("HDC"));
-        addStitch(new Stitch("HDC"));
-        addRow();
-//         addStitch(new Stitch("HDC"));
-//         addCluster();
-//         addStitch(new Stitch("HDC"));
-//         addCluster();
-// addStitch(new Stitch("HDC"));
-//         addCluster();
-// addStitch(new Stitch("HDC"));
-//         addCluster();
-// addStitch(new Stitch("HDC"));
-//         addCluster();
+    addCluster();
 
-
-
-    function getNodeInPrev(row, i) {
-        /*
-        Returns node directly underneath node of x = row + 1 and cluster = i
-        */
-        if (!foundation) {
-            return nodes[row][rows[row - 1]['stitches'] - i];
-        } else {
-            return nodes[row][i];
-        }
-    }
-    function getStitchY(row, y) {
-        if (y >= rows[row]['stitches'] || row < 0 || y < 0) {
-            console.log("error getting stitch "+y+" row "+row);
-            return null;
-        }
-        var cluster = 0;
-        var clusterIndex = 0;
-        var stitch = rows[row][0][0];
-        try {
-            while (y >= 0) {
-                stitch = rows[row][cluster][clusterIndex];
-                y--;
-                clusterIndex++;
-                while (clusterIndex==rows[row][cluster].length) {
-                    cluster++;
-                    clusterIndex = 0;
-                }
-            }
-        } catch (e) {
-            return stitch;
-        }
-    }
 
     function addStitch(stitch) {
         rows[curX]['stitches'] = curY + 1;
@@ -129,7 +114,7 @@ $(function() {
         stitch.left = stitch.origin.posX - stitch.width/2;
 
         if (rows[curX][curCluster][0] == stitch && curCluster!=0) {
-
+            //logic for calculating angles between clusters
             var base = distance(stitch.origin, stitch.prevStitch.origin);
             var curLeg = Math.sqrt(Math.pow(stitch.height,2) + Math.pow(stitch.width/2, 2));
             var prevLeg = Math.sqrt(Math.pow(stitch.prevStitch.height,2) + Math.pow(stitch.prevStitch.width/2, 2));
@@ -141,25 +126,38 @@ $(function() {
             var prevOriginStitch = rows[stitch.prevStitch.x][stitch.prevStitch.cluster][0];
             var prevMidpt = midpoint(prevOriginStitch.nodes[0], prevOriginStitch.nodes[1]);
 
-            var angleBefore = getAngleFromSides(stitch.prevStitch.height, prevOriginStitch.height,
-                distance(midpoint(stitch.prevStitch.nodes[0], stitch.prevStitch.nodes[1]),
-                    prevMidpt));
-            var maxAngle = getAngleFromSides(distance(stitch.prevStitch.origin, stitch.origin), prevOriginStitch.height,
-                    distance(prevMidpt, stitch.origin));
+            var angleBefore = stitch.prevStitch.angle - prevOriginStitch.angle;
 
-            var angleAfter = maxAngle - prevAngle - Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height);
-            rotateStitch(stitch, stitch.origin, -Math.PI/2 + (curAngle + Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height)));
-            rotateStitchesInCluster(stitch.prevStitch.x, stitch.prevStitch.cluster, (angleAfter - angleBefore));
+            // var slantOffset = slant;
+            // if (slant * (stitch.origin.posX - stitch.prevStitch.origin.posX) > 0) {
+            //     slantOffset = -slantOffset;
+            // }
 
-        } else {
-            var topLeft = makeNodeAt(stitch.nodes[3]);
-            topLeft.posY += stitch.height;
-            var distancePrev = distance(stitch.nodes[0], topLeft);
-            var angle = getAngleFromSides(stitch.height, stitch.height, distancePrev);
-            if (stitch.nodes[0].posX > topLeft.posX) {
-                angle = -angle;
+            rotateStitch(stitch, stitch.origin,
+                -Math.PI/2 + (curAngle -slant*stitch.dir+ Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height)));
+
+            var offset = Math.PI/2 - prevAngle - slant*stitch.dir- Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height);
+            if ((stitch.prevStitch.origin.posX - stitch.nodes[0].posX) * stitch.prevStitch.dir > 0) {
+                offset = -offset;
             }
+            if (rows[curX][stitch.prevStitch.cluster].length == 1 && stitch.prevStitch.cluster != 0) {
+                rotateStitchesInCluster(stitch.prevStitch.x, stitch.prevStitch.cluster, (offset - stitch.prevStitch.angle)/2);
+            } else {
+                rotateStitchesInCluster(stitch.prevStitch.x, stitch.prevStitch.cluster, (offset - stitch.prevStitch.angle));
+            }
+
+        } else if (curY == 0 && !foundation) {
+            var angle = -stitch.prevStitch.angle;
             rotateStitch(stitch, stitch.origin, angle);
+        } else if (!foundation) {
+            //logic for positioning stitches in same cluster
+            rotateStitch(stitch, stitch.origin, stitch.prevStitch.angle);
+            //average of previous and current stitches' angles from origin to top corners
+            var angle = Math.atan(stitch.width/2 / stitch.height) + Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height);
+            rotateStitch(stitch, stitch.origin, angle);
+            if (curCluster == 0 && !foundation) {
+                rotateStitchesInCluster(curX, curCluster, Math.atan(stitch.width/2 / stitch.height)*stitch.dir);
+            }
 
         }
         curY++;
@@ -194,14 +192,13 @@ $(function() {
                 nodes[curX][curY].posY, curX, curY+1);
         }
 
-        if (turning) {
+        if (curY == 0) {
             //add corner node
             nodes[curX+1] = {
                 0 : new Node(getNodeInPrev(curX, curCluster).posX,
                     getNodeInPrev(curX, curCluster).posY+stitch.height,
                     curX+1, 0)
             };
-            turning = false;
         }
 
         var origin = midpoint(getNodeInPrev(curX, curCluster), getNodeInPrev(curX, curCluster+1));
@@ -218,11 +215,6 @@ $(function() {
         stitch.nodes[3] = getNodeInPrev(curX, curCluster);
 
         stitch.setOrigin();
-        // getNodeInPrev(curX, curCluster+1).stitches[0] = stitch;
-        // getNodeInPrev(curX, curCluster).stitches[1] = stitch;
-        // nodes[curX+1][curY+1].stitches[2] = stitch;
-        // nodes[curX+1][curY].stitches[3] = stitch;
-
     }
 
     function addRow() {
@@ -238,13 +230,11 @@ $(function() {
         } else {
             //first node
             nodes[0] = {
-                0:new Node($("#container").width()/2, $("#container").height()/2, 0, 0)
+                0:new Node($("#container").width()/4, $("#container").height()/2, 0, 0)
             };
             curX = 0;
             toRight = true;
         }
-
-        turning = true;
 
         curCluster = 0;
         curY = 0;
@@ -276,9 +266,6 @@ $(function() {
     }
 
     function rotateStitch(stitch, origin, angle) {
-        // if (!toRight) {
-        //     angle = -angle;
-        // }
         stitch.angle += angle;
         angle *= stitch.dir;
         rotateNode(stitch.nodes[1], origin, angle);
@@ -290,7 +277,7 @@ $(function() {
 
     function rotateStitchesInCluster(row, clusterNum, angle) {
         var cluster = rows[row][clusterNum];
-        var origin = midpoint(cluster[0].nodes[2], cluster[0].nodes[3]);
+        var origin = cluster[0].origin;
         if (clusterNum == 0 || cluster.length == 1) {
             for (stitch in cluster) {
                 rotateStitch(cluster[stitch], origin, angle);
@@ -314,6 +301,38 @@ $(function() {
 
     }
 
+    function getNodeInPrev(row, i) {
+        /*
+        Returns node directly underneath node of x = row + 1 and cluster = i
+        */
+        if (!foundation) {
+            return nodes[row][rows[row - 1]['stitches'] - i];
+        } else {
+            return nodes[row][i];
+        }
+    }
+    function getStitchY(row, y) {
+        if (y >= rows[row]['stitches'] || row < 0 || y < 0) {
+            console.log("error getting stitch "+y+" row "+row);
+            return null;
+        }
+        var cluster = 0;
+        var clusterIndex = 0;
+        var stitch = rows[row][0][0];
+        try {
+            while (y >= 0) {
+                stitch = rows[row][cluster][clusterIndex];
+                y--;
+                clusterIndex++;
+                while (clusterIndex==rows[row][cluster].length) {
+                    cluster++;
+                    clusterIndex = 0;
+                }
+            }
+        } catch (e) {
+            return stitch;
+        }
+    }
     function getAngleFromSides(a, b, c) {
         return Math.acos((Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2*a*b));
     }
@@ -349,6 +368,7 @@ $(function() {
                 "width":self.width,
                 "height":self.height,
                 "background-color":"gray",
+                "border":"solid gray 1px",
                 "opacity":"0.5",
                 "transform-origin":"50% 100%",
                 "-ms-transform-origin":"50% 100%", /* IE 9 */
