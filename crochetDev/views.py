@@ -30,6 +30,8 @@ def createUser(request):
 		return render_to_response("homepage.html", {}, RequestContext(request))
 	return render_to_response("homepage.html", {}, RequestContext(request))
 
+def user(request):
+	return render_to_response("userpage.html", {}, RequestContext(request))
 
 def hello(request):
 	return HttpResponse("Hello")

@@ -156,4 +156,4 @@ LOGGING = {
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()
 
-LOGIN_URL = 'userpage.html'
+LOGIN_URL = '/templates/userpage.html'
