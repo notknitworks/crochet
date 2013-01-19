@@ -5,13 +5,21 @@
 <body>
 	<h1>Welcome to stitch-it!</h1>
 	<h4>Log in</h4>
-		<form action="/accounts/login/" method="post"> {% csrf_token %}
+{% if user.is_authenticated %}
+	<p>You are currently logged in as {{ user.username }}.</p>
+	<form action="/accounts/logout/" method="get">
+      <input type="submit" value="Logout"\>
+    </form>
+{% else %}
+	<form action="/accounts/login/" method="post"> {% csrf_token %}
 			<p>Type username:</p>
 			<input type="text" name="username" id="username">
 			<p>Type password:</p>
 			<input type="text" name="password">
-			<input type="submit" value="Create Account">
-		</form>
+			<input type="hidden" name="next" value="{{ next }}" />
+			<input type="submit" value="Login">
+	</form>
+{% endif %}
 	<h4>Create an account</h4>
 		<form action="/create/" method="post"> {% csrf_token %}
 			<p>Type username:</p>
