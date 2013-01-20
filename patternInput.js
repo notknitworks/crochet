@@ -29,7 +29,62 @@ $(document).ready(function(){
 			}
 		}
 	});
+
+	// $.ajax({
+	// 	type: "GET",
+	// 	dataType: "JSON",
+	// 	success: function (data) {
+	// 		parsePattern(data);
+	// 		console.log("pattern loaded");
+	// 	},
+	// 	error: function () {
+	// 		console.log("error loading pattern");
+	// 	}
+	// })
+
+	function parsePattern(pattern) {
+		var row = 0;
+		var cluster = 0;
+
+		while (row in pattern) {
+			addRow();
+			while (cluster in pattern[row]) {
+				if (pattern[row][cluster].length == 0) {
+					skipStitch();
+				} else {
+					for (var i=0; i < pattern[row][cluster].length; i++) {
+						addStitch(new Stitch(pattern[row][cluster][i]));
+					}
+					addCluster();
+				}
+				cluster++;
+			}
+			cluster = 0;
+			row++;
+		}
+		curCluster--;
+	}
+
+	//example format for saving patterns
+	parsePattern({
+		0:{
+			0:["HDC"],
+			1:["HDC"],
+			2:["HDC"]
+		},
+		1: {
+			0:["HDC", "HDC"],
+			1:[],
+			2:["HDC"]
+		},
+		2: {
+			0:["HDC", "HDC"],
+			1:[],
+			2:["HDC"]
+		}
+	});
 });
+
 
 /* creates a new row in the table that contains the pattern instructions
     each row conains a <div> element with contenteditable set to true; this

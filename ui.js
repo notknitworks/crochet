@@ -31,29 +31,46 @@ var rounds = false;
 $(function() {
 
     //must begin by adding a row
-    addRow();
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    addRow();
-    addStitch(new Stitch("HDC"));
-    addCluster();
-    addStitch(new Stitch("HDC"));
-    addCluster();
-    addStitch(new Stitch("HDC"));
-    addCluster();
-    addStitch(new Stitch("HDC"));
-    addCluster();
-    addStitch(new Stitch("HDC"));
-    addRow();
-    addStitch(new Stitch("HDC"));
-    skipStitch();
-    addStitch(new Stitch("HDC"));
-    skipStitch();
-    addStitch(new Stitch("HDC"));
+    //every row must end with addCluster();
+    // addRow();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+
+    // addRow();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addRow();
+    // addStitch(new Stitch("HDC"));
+    // skipStitch();
+    // addStitch(new Stitch("HDC"));
+    // skipStitch();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
 
 
 });
@@ -124,9 +141,6 @@ $(function() {
         curY++;
         addToCanvas(stitch);
 
-        if (foundation) {
-            addCluster();
-        }
     }
 
     function addNode(stitch) {
