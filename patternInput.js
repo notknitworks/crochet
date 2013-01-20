@@ -7,10 +7,10 @@ $(document).ready(function(){
 		createNextRow();
 	});
 
-	$(".edit").keyup(function(event){ 
+	$(".edit").keyup(function(event){
 		var keycode = (event.keyCode ? event.keyCode : event.which);
 		if(! (keycode == '13' || keycode == '188')) return;
-		userEnter($(this)); 
+		userEnter($(this));
 	});
 
 	$(".edit").keydown(function(event){
@@ -41,7 +41,7 @@ function createNextRow(){
 	$nextRow.append($("#addRowButton"));
 	$nextRow.append($("#feedback"));
 	$("#patternTable").append($nextRow);
-	
+
 	//set up the enter handler
 	$nextRow.find('.edit').keyup(function(event){
 		var keycode = (event.keyCode ? event.keyCode : event.which);
@@ -65,6 +65,8 @@ function createNextRow(){
 			}
 		}
 	});
+
+	addRow();
 };
 
 /*handler that every input box needs to have as its keyup event
@@ -89,7 +91,7 @@ function userEnter(newRow){
 		var newBox = document.createElement('span');
 		var stitchBox = document.createElement('span');
 		var xBox = document.createElement('span');
-		
+
 		stitchBox.innerHTML = parsedStitch.html;
 		newBox.classList.add("addedStitch");
 		newBox.classList.add(parsedStitch.valid);
@@ -97,7 +99,7 @@ function userEnter(newRow){
 		xBox.classList.add("delStitch");
 
 		$(xBox).click(function(){ delParent($(this));});
-		$(stitchBox).click(function(){ 
+		$(stitchBox).click(function(){
 			makeEditable($(this))
 		});
 		$(stitchBox).keyup(function(){
@@ -114,16 +116,16 @@ function userEnter(newRow){
 
 		if(document.activeElement.tagName == 'DIV'){
 			try{
-				(newRow.get(0)).insertBefore(newBox, node);		
+				(newRow.get(0)).insertBefore(newBox, node);
 			} catch(err){ return; }
-			
+
 		} else if (document.activeElement.tagName == 'SPAN'){
 			//(newRow.get(0)).replaceChild(newBox, document.activeElement.parentNode);
 			(newRow.get(0)).insertBefore(newBox, document.activeElement.parentNode);
 			//(newRow.get(0)).removeChild(document.activeElement.parentNode);
-			
+
 		}
-		
+
 	}
 
 	node.replaceWholeText("");
@@ -149,6 +151,9 @@ function parseInput(text){
 			numChain = parseInt(matching[1], 10);
 		}
 		//TODO make the CH object with numChain
+		for (var i=0; i < numChain; i++) {
+			addChain();
+		}
 		//return '<input type="text" class="right" value="ch ' + numChain + '     x" readonly>'
 		//return getHTMLBox("ch " + numChain, true);
 		this.html = "ch " + numChain;
@@ -169,9 +174,9 @@ function parseInput(text){
 			return;
 		}
 		//TODO make the Stitch object with numChain
-
+		addStitch(new Stitch(stitch.toUpperCase()));
 		//return getHTMLBox(stitch, true);
-		
+
 		this.html = stitch;
 		this.valid = "right";
 		return;
@@ -184,6 +189,7 @@ function parseInput(text){
 			numSkip = parseInt(matching[1], 10);
 		}
 		//return getHTMLBox("sk " + numSkip, true);
+		skipStitch();
 		this.html = "sk " + numSkip;
 		this.valid = "right";
 		return;

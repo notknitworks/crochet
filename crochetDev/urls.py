@@ -12,13 +12,13 @@ urlpatterns = patterns('',
     (r'^$', homePage),
     (r'^hello/$', hello),
     (r'^create/$', createUser),
-    #(r'^accounts/profile/$',  login, {'template_name': 'userpage.html'}),
-    #(r'^accounts/login/$',  login, {'template_name': 'userpage.html'}),
     (r'^accounts/login/$',  loginuser),
-    (r'^accounts/logout/$', logout, {'template_name': 'homepage.html'}),
+    (r'^accounts/logout/$', logout, {'next_page': '/'}),
     (r'^userpage/$', user),
     (r'^changepw/$', changepw),
-    (r'^savepattern/$', savepattern)
+    (r'^savepattern/$', savepattern),
+    (r'^(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': '/home/neha/crochetProj/crochetDev/static/'}),
     # url(r'^crochetDev/', include('crochetDev.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
