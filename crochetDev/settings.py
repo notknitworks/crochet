@@ -72,14 +72,16 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = 'crochetDev/static/'
+STATIC_URL = 'https://s3.amazonaws.com/nehastephcrochet/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
+    os.path.join(PROJECT_DIR, 'static'),
+
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -143,7 +145,8 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crochetDev.patterns'
+    'crochetDev.patterns',
+    'storages'
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -182,3 +185,12 @@ LOGGING = {
 
 LOGIN_URL = '/userpage'
 LOGIN_REDIRECT_URL = '/userpage'
+
+#AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
+AWS_STORAGE_BUCKET_NAME = 'nehastephcrochet'
+STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+S3_URL = 'http://%s.s3.amazonaws.com/' % AWS_STORAGE_BUCKET_NAME
+STATIC_URL = S3_URL
+
+AWS_ACCESS_KEY_ID = 'AKIAI6T5XIT62DUQG4YQ'
+AWS_SECRET_ACCESS_KEY = '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'
