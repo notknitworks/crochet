@@ -11,6 +11,7 @@ from django.contrib import auth
 from django.contrib import messages
 from patterns.models import Patterns
 from django.contrib.sessions.models import Session
+from django.utils import simplejson
 
 def homePage(request):
 	#if request.method == 'POST':
@@ -41,7 +42,7 @@ def changepw(request):
 		currentpwd = request.POST['current']
 		if user.check_password(request.POST['current']):
 			check1 = request.POST['new1']
-			check2 = request.POST['new2']	
+			check2 = request.POST['new2']
 			if check1 == check2:
 				user.set_password(check1)
 				user.save()
@@ -76,6 +77,13 @@ def loginuser(request):
 				return render_to_response("homepage.html", {}, RequestContext(request))
 		else:
 			return render_to_response("userpage.html", {}, RequestContext(request))
+	elif request.method == 'GET':
+		username = request.user.username
+		patternName = request.GET['pattern']
+		pattern = Patterns.objects.filter(user=username, pattern=patternName)
+		pattern = simplejson.dumps(pattern)
+		return HttpResponse(pattern, content_type="application/json")
+
 	else:
 		user = request.user
 		request.session['patterns'] = Patterns.objects.filter(user=user.username)
