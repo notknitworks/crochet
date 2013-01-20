@@ -79,7 +79,7 @@ $(function() {
 
         rows[curX][curCluster].push(stitch);
         addNode(stitch);
-        
+
 
         if (rows[curX][curCluster][0] == stitch && curY!=0) {
             //logic for calculating angles between clusters

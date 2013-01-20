@@ -1,4 +1,19 @@
+<!--html>
+<head>
+  <script type="" src="http://s3.amazonaws.com/nehastephcrochet/"></script>
+  <script src="http://s3.amazonaws.com/nehastephcrochet/ui.js"></script>
+  <script src="http://s3.amazonaws.com/nehastephcrochet/patternInput.js"></script>
+  <link rel="stylesheet" type="http://s3.amazonaws.com/nehastephcrochet/text/css" href="patternInput.css">
+  </head>
+<body-->
+{% extends "http://s3.amazonaws.com/nehastephcrochet/patternInput.html" %}
+
+{% block userContent %}
+
 {% if user.is_authenticated %}
+
+
+
   <h1>Welcome, {{ user.username }}!</h1>
 <form action="/accounts/logout/" method="get">
       <input type="submit" value="Logout"\>
@@ -31,7 +46,7 @@
     <p>Design your pattern</p>
     Submit button here
   </form>
-  
+
   <h3>Change password</h3>
   <form action="/changepw/" method="post"> {% csrf_token %}
    	<p>Type current password</p>
@@ -49,4 +64,8 @@
       <input type="submit" value="Go Back"\>
    </form>
 {% endif %}
- 
+
+{% endblock %}
+<!--/body>
+
+ </html-->
