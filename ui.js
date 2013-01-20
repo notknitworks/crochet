@@ -45,14 +45,6 @@ $(function() {
     // addCluster();
     // addStitch(new Stitch("HDC"));
     // addCluster();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
 
     // addRow();
     // addStitch(new Stitch("HDC"));
@@ -64,13 +56,10 @@ $(function() {
     // addStitch(new Stitch("HDC"));
     // addCluster();
     // addStitch(new Stitch("HDC"));
-    // addRow();
-    // addStitch(new Stitch("HDC"));
-    // skipStitch();
-    // addStitch(new Stitch("HDC"));
-    // skipStitch();
-    // addStitch(new Stitch("HDC"));
     // addCluster();
+    // addRow();
+
+
 
 
 });
@@ -94,7 +83,7 @@ $(function() {
         addNode(stitch);
 
 
-        if (rows[curX][curCluster][0] == stitch && curCluster!=0) {
+        if (rows[curX][curCluster][0] == stitch && curY!=0) {
             //logic for calculating angles between clusters
             var base = distance(stitch.origin, stitch.prevStitch.origin);
             var curLeg = Math.sqrt(Math.pow(stitch.height,2) + Math.pow(stitch.width/2, 2));
@@ -118,7 +107,7 @@ $(function() {
                 -Math.PI/2 + (curAngle -slant*stitch.dir+ Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height)));
 
             var offset = Math.PI/2 - prevAngle - slant*stitch.dir- Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height);
-            if ((stitch.prevStitch.origin.posX - stitch.nodes[0].posX) * stitch.prevStitch.dir > 0) {
+            if ((stitch.prevStitch.origin.posX - stitch.nodes[0].posX) * stitch.dir > 0) {
                 offset = -offset;
             }
             if (rows[curX][stitch.prevStitch.cluster].length == 1 && stitch.prevStitch.cluster != 0) {
@@ -128,7 +117,8 @@ $(function() {
             }
 
         } else if (curY == 0 && !foundation) {
-            var angle = -stitch.prevStitch.angle;
+            var angle = -getStitchY(curX-1, rows[curX-1]['stitches'] - curCluster - 1).angle;
+            //var angle = -stitch.prevStitch.angle;
             rotateStitch(stitch, stitch.origin, angle);
         } else if (!foundation) {
             rotateNextStitchInCluster(stitch);
@@ -292,7 +282,7 @@ $(function() {
         } else {
             //first node
             nodes[0] = {
-                0:new Node($("#container").width()/4, $("#container").height()/2, 0, 0)
+                0:new Node($("#interface").width()/4, $("#interface").height()/2, 0, 0)
             };
             curX = 0;
             toRight = true;
@@ -409,15 +399,15 @@ $(function() {
         var stitch = rows[row][0][0];
         try {
             while (y >= 0) {
-                stitch = rows[row][cluster][clusterIndex];
-                y--;
-                clusterIndex++;
                 while (clusterIndex==rows[row][cluster].length) {
                     cluster++;
                     clusterIndex = 0;
                 }
+                stitch = rows[row][cluster][clusterIndex];
+                y--;
+                clusterIndex++;
             }
-        } catch (e) {
+        } finally {
             return stitch;
         }
     }
@@ -512,7 +502,7 @@ $(function() {
             stitch.div.css("top",stitch.top);
         } else {
             stitch.div.css("top", 600-stitch.top);
-            $("#container").append(stitch.div);
+            $("#interface").append(stitch.div);
         }
         if (Math.abs(stitch.angle) < 1e-5) {
             stitch.angle = 0;

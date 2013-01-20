@@ -33,11 +33,12 @@ $(document).ready(function(){
 	// $.ajax({
 	// 	type: "GET",
 	// 	dataType: "JSON",
-	// 	success: function (data) {
+	// 	success: function(data) {
+			// $("#interface").data("pattern", data);
 	// 		parsePattern(data);
 	// 		console.log("pattern loaded");
 	// 	},
-	// 	error: function () {
+	// 	error: function() {
 	// 		console.log("error loading pattern");
 	// 	}
 	// })
@@ -66,23 +67,25 @@ $(document).ready(function(){
 	}
 
 	//example format for saving patterns
-	parsePattern({
+	var testData = {
 		0:{
 			0:["HDC"],
 			1:["HDC"],
-			2:["HDC"]
+			2:["HDC"],
+			3:["HDC"],
 		},
 		1: {
 			0:["HDC", "HDC"],
 			1:[],
-			2:["HDC"]
+			2:["HDC"],
+			3:["HDC"]
 		},
 		2: {
 			0:["HDC", "HDC"],
-			1:[],
-			2:["HDC"]
 		}
-	});
+	};
+	$("#interface").data("pattern", testData);
+	parsePattern($("#interface").data("pattern"));
 });
 
 
@@ -122,7 +125,22 @@ function createNextRow(){
 	});
 
 	addRow();
+	$("#interface").data("pattern")[curX] = { 0: new Array() };
 };
+
+function savePattern() {
+	$.ajax({
+		type: "POST",
+		data: $("#interface").data("pattern"),
+		dataType: "JSON",
+		success: function(data) {
+			console.log("pattern saved");
+		},
+		error: function(data) {
+			console.log("error saving pattern");
+		}
+	});
+}
 
 /*handler that every input box needs to have as its keyup event
   for ever new input, adds a span in the following configuration:
@@ -230,6 +248,7 @@ function parseInput(text){
 		}
 		//TODO make the Stitch object with numChain
 		addStitch(new Stitch(stitch.toUpperCase()));
+		$("#interface").data("pattern")[curX][curCluster].push(stitch.toUpperCase());
 		//return getHTMLBox(stitch, true);
 
 		this.html = stitch;
@@ -245,6 +264,11 @@ function parseInput(text){
 		}
 		//return getHTMLBox("sk " + numSkip, true);
 		skipStitch();
+		var rowData = $("#interface").data("pattern")[curX];
+		if (!(curCluster-1 in rowData)) {
+			rowData[curCluster-1] = new Array();
+		}
+		rowData[curCluster] = new Array();
 		this.html = "sk " + numSkip;
 		this.valid = "right";
 		return;
