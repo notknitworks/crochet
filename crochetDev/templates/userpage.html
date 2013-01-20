@@ -31,7 +31,7 @@
   <h3>Saved Patterns</h3>
   <ul>
   {% for pattern in request.session.patterns %}
-  <li>{{ pattern.name }} </li>
+  <li class='pattern' pattern="{{ pattern.pattern }}">{{ pattern.name }} : {{ pattern.pattern }}</li>
   {% endfor %}
   </ul>
 {% else %}

@@ -33,8 +33,9 @@ $(document).ready(function(){
 	// $.ajax({
 	// 	type: "GET",
 	// 	dataType: "JSON",
+	// 	data: {"pattern":"pattern 2"},
 	// 	success: function(data) {
-			// $("#interface").data("pattern", data);
+	// 		$("#interface").data("pattern", data);
 	// 		parsePattern(data);
 	// 		console.log("pattern loaded");
 	// 	},
@@ -42,6 +43,13 @@ $(document).ready(function(){
 	// 		console.log("error loading pattern");
 	// 	}
 	// })
+
+	// $.getJSON("/accounts/login/", {"pattern":"pattern"},
+	// 	function(data){
+	// 		$("#interface").data("pattern", data);
+	// 		parsePattern(data);
+	// 		console.log("pattern loaded");
+	// });
 
 	function parsePattern(pattern) {
 		var row = 0;
@@ -67,25 +75,28 @@ $(document).ready(function(){
 	}
 
 	//example format for saving patterns
-	var testData = {
-		0:{
-			0:["HDC"],
-			1:["HDC"],
-			2:["HDC"],
-			3:["HDC"],
-		},
-		1: {
-			0:["HDC", "HDC"],
-			1:[],
-			2:["HDC"],
-			3:["HDC"]
-		},
-		2: {
-			0:["HDC", "HDC"],
-		}
-	};
-	$("#interface").data("pattern", testData);
+	// var testData = {
+	// 	0:{
+	// 		0:["HDC"],
+	// 		1:["HDC"],
+	// 		2:["HDC"],
+	// 		3:["HDC"],
+	// 	},
+	// 	1: {
+	// 		0:["HDC", "HDC"],
+	// 		1:[],
+	// 		2:["HDC"],
+	// 		3:["HDC"]
+	// 	},
+	// 	2: {
+	// 		0:["HDC", "HDC"],
+	// 	}
+	// };
+	$(".pattern").load(function() {
+			$("#interface").data("pattern", $(this).attr("pattern"));
+			console.log($("#interface").data("pattern"));
 	parsePattern($("#interface").data("pattern"));
+	});
 });
 
 

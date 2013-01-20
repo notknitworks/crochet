@@ -523,9 +523,6 @@ $(function() {
     }
 
 
-//DEBUGGING METHODS
-console.log("yay");
-console.log(getStitchY(1, 8));
 
 for (node in nodes) {
     printNodesInRow(node);

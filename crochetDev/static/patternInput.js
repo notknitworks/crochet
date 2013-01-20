@@ -29,12 +29,12 @@ $(document).ready(function(){
 			}
 		}
 	});
-
 	// $.ajax({
 	// 	type: "GET",
 	// 	dataType: "JSON",
+	// 	data: {"pattern":"pattern 2"},
 	// 	success: function(data) {
-			// $("#interface").data("pattern", data);
+	// 		$("#interface").data("pattern", data);
 	// 		parsePattern(data);
 	// 		console.log("pattern loaded");
 	// 	},
@@ -42,6 +42,42 @@ $(document).ready(function(){
 	// 		console.log("error loading pattern");
 	// 	}
 	// })
+
+	// $.getJSON("/accounts/login/", {"pattern":"pattern"},
+	// 	function(data){
+	// 		$("#interface").data("pattern", data);
+	// 		parsePattern(data);
+	// 		console.log("pattern loaded");
+	// });
+
+
+	//example format for saving patterns
+	// var testData = {
+	// 	0:{
+	// 		0:["HDC"],
+	// 		1:["HDC"],
+	// 		2:["HDC"],
+	// 		3:["HDC"],
+	// 	},
+	// 	1: {
+	// 		0:["HDC", "HDC"],
+	// 		1:[],
+	// 		2:["HDC"],
+	// 		3:["HDC"]
+	// 	},
+	// 	2: {
+	// 		0:["HDC", "HDC"],
+	// 	}
+	// };
+
+	$(".pattern").load(function() {
+			console.log("HI");
+			$("#interface").data("pattern", $(this).attr("pattern"));
+			console.log($("#interface").data("pattern"));
+	parsePattern($.parseJSON($("#interface").data("pattern")));
+	});
+});
+
 
 	function parsePattern(pattern) {
 		var row = 0;
@@ -65,30 +101,6 @@ $(document).ready(function(){
 		}
 		curCluster--;
 	}
-
-	//example format for saving patterns
-	var testData = {
-		0:{
-			0:["HDC"],
-			1:["HDC"],
-			2:["HDC"],
-			3:["HDC"],
-		},
-		1: {
-			0:["HDC", "HDC"],
-			1:[],
-			2:["HDC"],
-			3:["HDC"]
-		},
-		2: {
-			0:["HDC", "HDC"],
-		}
-	};
-	$("#interface").data("pattern", testData);
-	parsePattern($("#interface").data("pattern"));
-});
-
-
 /* creates a new row in the table that contains the pattern instructions
     each row conains a <div> element with contenteditable set to true; this
     is where the user would type in new stitches*/

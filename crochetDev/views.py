@@ -12,6 +12,7 @@ from django.contrib import messages
 from patterns.models import Patterns
 from django.contrib.sessions.models import Session
 from django.utils import simplejson
+import json
 
 def homePage(request):
 	#if request.method == 'POST':
@@ -77,12 +78,12 @@ def loginuser(request):
 				return render_to_response("homepage.html", {}, RequestContext(request))
 		else:
 			return render_to_response("userpage.html", {}, RequestContext(request))
-	elif request.method == 'GET':
-		username = request.user.username
-		patternName = request.GET['pattern']
-		pattern = Patterns.objects.filter(user=username, pattern=patternName)
-		pattern = simplejson.dumps(pattern)
-		return HttpResponse(pattern, content_type="application/json")
+	# elif request.method == 'GET':
+	# 	username = request.user.username
+	# 	patternName = request.GET['pattern']
+	# 	pattern = Patterns.objects.filter(user=username, pattern=patternName)[0].pattern
+	# 	pattern = simplejson.dumps(pattern)
+	# 	return HttpResponse(pattern, content_type="application/json")
 
 	else:
 		user = request.user
