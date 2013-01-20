@@ -32,7 +32,46 @@ var STITCH_IMGS = {
 $(function() {
 
     //must begin by adding a row
-    
+    //every row must end with addCluster();
+    // addRow();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+
+    // addRow();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
+    // addStitch(new Stitch("HDC"));
+    // addRow();
+    // addStitch(new Stitch("HDC"));
+    // skipStitch();
+    // addStitch(new Stitch("HDC"));
+    // skipStitch();
+    // addStitch(new Stitch("HDC"));
+    // addCluster();
 
 
 });
@@ -51,7 +90,7 @@ $(function() {
 
         rows[curX][curCluster].push(stitch);
         addNode(stitch);
-
+        
 
         if (rows[curX][curCluster][0] == stitch && curCluster!=0) {
             //logic for calculating angles between clusters
@@ -99,9 +138,6 @@ $(function() {
         curY++;
         addToCanvas(stitch);
 
-        if (foundation) {
-            addCluster();
-        }
     }
 
     function addNode(stitch) {
