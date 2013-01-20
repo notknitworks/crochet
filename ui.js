@@ -1,4 +1,5 @@
 
+
 var foundation = true;
 var toRight;
 
@@ -11,23 +12,23 @@ var nodes = {};
 var rounds = false;
 
 
-    var STITCH_IMGS = {
-        ch:{
-            SRC:"",
-            WIDTH:20,
-            HEIGHT:10,
-        },
-        SC:{
-            SRC:"",
-            WIDTH:20,
-            HEIGHT:20
-        },
-        HDC:{
-            SRC:"",
-            WIDTH:20,
-            HEIGHT:40
-        }
-    };
+var STITCH_IMGS = {
+    ch:{
+        SRC:"",
+        WIDTH:20,
+        HEIGHT:10,
+    },
+    SC:{
+        SRC:"",
+        WIDTH:20,
+        HEIGHT:20
+    },
+    HDC:{
+        SRC:"",
+        WIDTH:20,
+        HEIGHT:40
+    }
+};
 $(function() {
 
     //must begin by adding a row
@@ -64,7 +65,6 @@ $(function() {
 
 });
 
-
     function addStitch(stitch) {
         rows[curX]['stitches']++;
         if (!toRight) {
@@ -78,10 +78,8 @@ $(function() {
         }
 
         rows[curX][curCluster].push(stitch);
-
-
         addNode(stitch);
-
+        
 
         if (rows[curX][curCluster][0] == stitch && curY!=0) {
             //logic for calculating angles between clusters
@@ -101,7 +99,6 @@ $(function() {
             // var slantOffset = slant;
             // if (slant * (stitch.origin.posX - stitch.prevStitch.origin.posX) > 0) {
             //     slantOffset = -slantOffset;
-            // }itch.angle
 
             rotateStitch(stitch, stitch.origin,
                 -Math.PI/2 + (curAngle -slant*stitch.dir+ Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height)));
@@ -170,6 +167,7 @@ $(function() {
         }
 
         var origin = midpoint(getNodeInPrev(curX, curCluster), getNodeInPrev(curX, curCluster+1));
+
         var offset = stitch.width/2 * stitch.dir;
 
         stitch.nodes[0] = nodes[curX+1][curY];
@@ -189,6 +187,7 @@ $(function() {
         stitch.nodes[3] = getNodeInPrev(curX, curCluster);
 
         stitch.setOrigin();
+
         stitch.top = stitch.origin.posY + stitch.height;
         stitch.left = stitch.origin.posX - stitch.width/2;
     }
@@ -487,6 +486,7 @@ $(function() {
                 "width":self.width,
                 "height":self.height,
                 "background-color":"gray",
+                "border":"solid gray 1px",
                 "opacity":"0.5",
                 "-ms-transform-origin":"0 0", /* IE 9 */
                 "-webkit-transform-origin":"0 0", /* Safari and Chrome */
@@ -504,6 +504,7 @@ $(function() {
             stitch.div.css("top", 600-stitch.top);
             $("#interface").append(stitch.div);
         }
+
         if (Math.abs(stitch.angle) < 1e-5) {
             stitch.angle = 0;
         }
@@ -524,6 +525,7 @@ $(function() {
 
 //DEBUGGING METHODS
 console.log("yay");
+console.log(getStitchY(1, 8));
 
 for (node in nodes) {
     printNodesInRow(node);

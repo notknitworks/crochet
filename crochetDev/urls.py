@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
-from crochetDev.views import homePage, hello
+from django.contrib.auth.views import login, logout
+from crochetDev.views import homePage, hello, createUser, user, loginuser, changepw, savepattern
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -10,6 +11,14 @@ urlpatterns = patterns('',
     # url(r'^$', 'crochetDev.views.home', name='home'),
     (r'^$', homePage),
     (r'^hello/$', hello),
+    (r'^create/$', createUser),
+    (r'^accounts/login/$',  loginuser),
+    (r'^accounts/logout/$', logout, {'next_page': '/'}),
+    (r'^userpage/$', user),
+    (r'^changepw/$', changepw),
+    (r'^savepattern/$', savepattern),
+    (r'^(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': '/home/neha/crochetProj/crochetDev/static/'}),
     # url(r'^crochetDev/', include('crochetDev.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

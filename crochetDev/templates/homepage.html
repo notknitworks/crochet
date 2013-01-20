@@ -1,0 +1,40 @@
+<html>
+<head>
+	<!--<script src="account.js"></script>-->
+	<!-- for testing purposes
+	<ling rel="stylesheet" type="text/css" href="base.css" -->
+	<link rel="stylesheet" type="text/css" href="https://s3.amazonaws.com/nehastephcrochet/base.css">
+</head>
+
+<body>
+	<h1>Welcome to stitch-it!</h1>
+	
+{% if user.is_authenticated %}
+	<p>You are currently logged in as {{ user.username }}.</p>
+	<form action="/accounts/logout/" method="get">
+      <input type="submit" value="Logout"\>
+    </form>
+{% else %}
+	<form action="/accounts/login/" method="post"> {% csrf_token %}
+		<div id="left">
+			<input type="text" name="username" id="username" placeholder="username">
+			<input type="password" name="password" placeholder="password">
+		</div>
+		<div id="right">
+			<input type="hidden" name="next" value="{{ next }}" />
+			<input type="submit" value="Login">
+		</div>
+	</form>
+	<div id="create"> new? create an account </div>
+{% endif %}
+	
+	
+		<form action="/create/" method="post"> {% csrf_token %}
+			<h4>Create an account</h4>
+			<input type="text" name="username" id="username" placeholder="username">
+			<span id="available">{{ available }} </span>
+			<input type="text" name="password" placeholder="password">
+			<input type="submit" value="Create Account">
+		</form>
+</body>
+</html>

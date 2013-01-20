@@ -1,0 +1,52 @@
+{% if user.is_authenticated %}
+  <h1>Welcome, {{ user.username }}!</h1>
+<form action="/accounts/logout/" method="get">
+      <input type="submit" value="Logout"\>
+</form>
+
+{% if messages %}
+	<ul>
+	{% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+	</ul>
+{% endif %}
+
+{% if request.session.patterns %}
+  <h3>Saved Patterns</h3>
+  <ul>
+  {% for pattern in request.session.patterns %}
+  <li>{{ pattern.name }} </li>
+  {% endfor %}
+  </ul>
+{% else %}
+  <h3>You have no saved patterns.</h3>
+{% endif %}
+
+  <h3>Create a new pattern</h3>
+  <form action="/savepattern/" method="get">
+    <p>Name your pattern</p>
+    <input type="text" name="name">
+    <input type="submit" value="Create">
+    <p>Design your pattern</p>
+    Submit button here
+  </form>
+  
+  <h3>Change password</h3>
+  <form action="/changepw/" method="post"> {% csrf_token %}
+   	<p>Type current password</p>
+	<input type="text" name="current">
+	<p>Type in new password</p>
+	<input type="text" name="new1">
+	<p>Re-type new password</p>
+	<input type="text" name="new2">
+	<input type="submit" value="Change Password">
+   </form>
+
+{% else %}
+  <h1>The password you entered was incorrect or you do not have an account yet</h1>
+  <form action="/" method="get">
+      <input type="submit" value="Go Back"\>
+   </form>
+{% endif %}
+ 

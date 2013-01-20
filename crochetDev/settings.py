@@ -1,4 +1,6 @@
 # Django settings for crochetDev project.
+import os.path
+PROJECT_DIR = os.path.dirname(__file__) # this is not Django setting.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -9,16 +11,30 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+# Parse database configuration from $DATABASE_URL
+
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'npatki+crochet',                      # Or path to database file if using sqlite3.
-        'USER': 'npatki',                      # Not used with sqlite3.
-        'PASSWORD': 'crochet',                  # Not used with sqlite3.
-        'HOST': 'sql.mit.edu',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    #'default': {
+    #   'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+    #    'NAME': 'npatki+crochet',                      # Or path to database file if using sqlite3.
+    #   'USER': 'npatki',                      # Not used with sqlite3.
+    #   'PASSWORD': 'crochet',                  # Not used with sqlite3.
+    #   'HOST': 'sql.mit.edu',                      # Set to empty string for localhost. Not used with sqlite3.
+    #   'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    #}
+    'default':{
+        'ENGINE':'django.db.backends.postgresql_psycopg2',
+        'NAME': 'd86n1jf310rruu',
+        'USER': 'bjczbfqhkugohz',
+        'PASSWORD': 'wOIDYdTb3l3UK_RZCd-Py2KkoA',
+        'HOST': 'ec2-54-243-241-126.compute-1.amazonaws.com',
+        'PORT': '5432'
     }
 }
+
+#import dj_database_url
+#DATABASES['default'] =  dj_database_url.config(default='postgres://localhost')
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -87,6 +103,17 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
+    "django.core.context_processors.request",
+)
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -106,6 +133,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.join(PROJECT_DIR, "templates"),
 )
 
 INSTALLED_APPS = (
@@ -115,6 +143,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crochetDev.patterns'
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -149,6 +178,7 @@ LOGGING = {
         },
     }
 }
-# Parse database configuration from $DATABASE_URL
-import dj_database_url
-DATABASES['default'] =  dj_database_url.config()
+
+
+LOGIN_URL = '/userpage'
+LOGIN_REDIRECT_URL = '/userpage'
