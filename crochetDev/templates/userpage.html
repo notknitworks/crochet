@@ -12,32 +12,40 @@
 
 {% if user.is_authenticated %}
 
+{% if user.username == account.username %}
 
+      <h1>Welcome, {{ account.username }}!</h1>
+      <form action="/accounts/logout/" method="get">
+            <input type="submit" value="Logout"\>
+      </form>
 
-  <h1>Welcome, {{ user.username }}!</h1>
-<form action="/accounts/logout/" method="get">
-      <input type="submit" value="Logout"\>
-</form>
+      {% if messages %}
+      	<ul>
+      	{% for message in messages %}
+          <li>{{ message }}</li>
+          {% endfor %}
+      	</ul>
+      {% endif %}
 
-{% if messages %}
-	<ul>
-	{% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-	</ul>
+{% else %}
+      <h1>This is {{ account.username }}'s profile</h1>
+      <a href="/account/{{ user.username }}">My profile.</a>
+
 {% endif %}
 
-{% if request.session.patterns %}
+
+{% if request.session.viewpatterns %}
   <h3>Saved Patterns</h3>
   <ul>
-  {% for pattern in request.session.patterns %}
+  {% for pattern in request.session.viewpatterns %}
   <li class='pattern' pattern="{{ pattern.pattern }}">{{ pattern.name }} : {{ pattern.pattern }}</li>
   {% endfor %}
   </ul>
 {% else %}
-  <h3>You have no saved patterns.</h3>
+  <h3>No saved patterns.</h3>
 {% endif %}
 
+{% if user.username == account.username %}
   <h3>Create a new pattern</h3>
   <form action="/savepattern/" method="post">{% csrf_token %}
     <p>Name your pattern</p>
@@ -57,6 +65,7 @@
 	<input type="text" name="new2">
 	<input type="submit" value="Change Password">
    </form>
+{% endif %}
 
 {% if request.session.users %}
    <h3>See other users</h3>

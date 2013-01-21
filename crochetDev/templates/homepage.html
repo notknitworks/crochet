@@ -11,6 +11,7 @@
 	
 {% if user.is_authenticated %}
 	<p>You are currently logged in as {{ user.username }}.</p>
+	<a href="/account/{{ user.username }}">Go to my page.</a>
 	<form action="/accounts/logout/" method="get">
       <input type="submit" value="Logout"\>
     </form>

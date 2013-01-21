@@ -13,28 +13,18 @@ from patterns.models import Patterns
 from django.contrib.sessions.models import Session
 from django.utils import simplejson
 import json
+from django.shortcuts import redirect
 
 def homePage(request):
-	#if request.method == 'POST':
-	#	useName = request.POST['username']
-	#	passWord = request.POST['password']
-	#	user = User.objects.create_user(username=useName,password=passWord)
-	#	user.save()
-	#	user = auth.authenticate(username=username, password=password)
-		#request.session['username'] = userName
-	#	return HttpResponseRedirect("Hello")
 	return render_to_response("homepage.html", {}, RequestContext(request))
 
 def createUser(request):
 	if request.method == 'POST':
-		useName = request.POST['username']
-		passWord = request.POST['password']
-		user = User.objects.create_user(username=useName,password=passWord)
+		username = request.POST['username']
+		password = request.POST['password']
+		user = User.objects.create_user(username=username,password=password)
 		user.save()
-		user = auth.authenticate(username=userName, password=password)
-		#request.session['username'] = userName
-		#return HttpResponseRedirect("Hello")
-		return render_to_response("userpage.html", {}, RequestContext(request))
+		return loginuser(request)
 	return render_to_response("userpage.html", {}, RequestContext(request))
 
 def changepw(request):
@@ -61,7 +51,19 @@ def user(request):
 	return render_to_response("userpage.html", {}, RequestContext(request))
 
 def viewuser(request, name):
-	return HttpResponse("Say hi to " + name)
+	user = request.user
+	if user is not None:
+		if user.username == name:
+			request.session['users'] = User.objects.all().exclude(username=user.username).order_by('?')[:10]
+			request.session['viewpatterns'] = Patterns.objects.filter(user=user.username)
+			return render_to_response("userpage.html", {'account':user}, RequestContext(request))
+		viewuser = User.objects.filter(username=name)
+		if(len(viewuser) == 1):
+			request.session['users'] = User.objects.all().exclude(username=user.username).exclude(username=viewuser[0].username).order_by('?')[:10]
+			request.session['viewpatterns'] = Patterns.objects.filter(user=viewuser[0].username)
+			return render_to_response("userpage.html", {'account':viewuser[0]}, RequestContext(request))
+		return HttpResponse("We cannot find the person you are looking for!")
+	return HttpResponse("something went wrong")
 
 def hello(request):
 	return HttpResponse("Hello")
@@ -76,24 +78,20 @@ def loginuser(request):
 				login(request)
 				patterns = Patterns.objects.filter(user=username)
 				request.session['patterns'] = Patterns.objects.filter(user=username)
-				request.session['users'] = User.objects.all().exclude(username=username)
-				return render_to_response("userpage.html", {}, RequestContext(request))
+				#request.session['users'] = User.objects.all().exclude(username=username)
+				#choosing random 10 people for now	
+				
+				return redirect("/account/" + username)
 			else:
 				return render_to_response("homepage.html", {}, RequestContext(request))
 		else:
 			return render_to_response("userpage.html", {}, RequestContext(request))
-	# elif request.method == 'GET':
-	# 	username = request.user.username
-	# 	patternName = request.GET['pattern']
-	# 	pattern = Patterns.objects.filter(user=username, pattern=patternName)[0].pattern
-	# 	pattern = simplejson.dumps(pattern)
-	# 	return HttpResponse(pattern, content_type="application/json")
-
 	else:
 		user = request.user
 		request.session['patterns'] = Patterns.objects.filter(user=user.username)
 		request.session['users'] = User.objects.all().exclude(username=user.username)
-		return render_to_response("userpage.html", {}, RequestContext(request))
+		#return render_to_response("userpage.html", {}, RequestContext(request))
+		return redirect("/account/" + username)
 
 def savepattern(request):
 	username = request.user.username
