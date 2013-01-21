@@ -208,9 +208,7 @@ function userEnter(newRow){
 			//(newRow.get(0)).replaceChild(newBox, document.activeElement.parentNode);
 			(newRow.get(0)).insertBefore(newBox, document.activeElement.parentNode);
 			//(newRow.get(0)).removeChild(document.activeElement.parentNode);
-
 		}
-
 	}
 
 	node.replaceWholeText("");

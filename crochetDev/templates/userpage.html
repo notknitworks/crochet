@@ -39,7 +39,7 @@
 {% endif %}
 
   <h3>Create a new pattern</h3>
-  <form action="/savepattern/" method="get">
+  <form action="/savepattern/" method="post">{% csrf_token %}
     <p>Name your pattern</p>
     <input type="text" name="name">
     <input type="submit" value="Create">

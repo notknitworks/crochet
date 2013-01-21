@@ -92,7 +92,7 @@ def loginuser(request):
 
 def savepattern(request):
 	username = request.user.username
-	patternName = request.GET['name']
+	patternName = request.POST['name']
 	pattern = Patterns(user=username, name=patternName, pattern='some pattern')
 	pattern.save()
 	request.session['patterns'] = Patterns.objects.filter(user=username)

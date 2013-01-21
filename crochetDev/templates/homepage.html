@@ -3,7 +3,7 @@
 	<!--<script src="account.js"></script>-->
 	<!-- for testing purposes
 	<ling rel="stylesheet" type="text/css" href="base.css" -->
-	<link rel="stylesheet" type="text/css" href="https://s3.amazonaws.com/nehastephcrochet/base.css">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}base.css">
 </head>
 
 <body>
@@ -21,7 +21,7 @@
 			<input type="password" name="password" placeholder="password">
 		</div>
 		<div id="right">
-			<input type="hidden" name="next" value="{{ next }}" />
+			<input type="hidden" name="next" value="{{next}}" />
 			<input type="submit" value="Login">
 		</div>
 	</form>
