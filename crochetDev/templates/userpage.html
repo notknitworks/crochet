@@ -58,6 +58,15 @@
 	<input type="submit" value="Change Password">
    </form>
 
+{% if request.session.users %}
+   <h3>See other users</h3>
+   <ul>
+   {% for user in request.session.users %}
+   <li > <a href="/account/{{user.username}}">{{user.username}} </a></li>
+   {% endfor %}
+   </ul>
+{% endif %}
+
 {% else %}
   <h1>The password you entered was incorrect or you do not have an account yet</h1>
   <form action="/" method="get">

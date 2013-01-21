@@ -60,6 +60,9 @@ def changepw(request):
 def user(request):
 	return render_to_response("userpage.html", {}, RequestContext(request))
 
+def viewuser(request, name):
+	return HttpResponse("Say hi to " + name)
+
 def hello(request):
 	return HttpResponse("Hello")
 
@@ -73,6 +76,7 @@ def loginuser(request):
 				login(request)
 				patterns = Patterns.objects.filter(user=username)
 				request.session['patterns'] = Patterns.objects.filter(user=username)
+				request.session['users'] = User.objects.all().exclude(username=username)
 				return render_to_response("userpage.html", {}, RequestContext(request))
 			else:
 				return render_to_response("homepage.html", {}, RequestContext(request))
@@ -88,6 +92,7 @@ def loginuser(request):
 	else:
 		user = request.user
 		request.session['patterns'] = Patterns.objects.filter(user=user.username)
+		request.session['users'] = User.objects.all().exclude(username=user.username)
 		return render_to_response("userpage.html", {}, RequestContext(request))
 
 def savepattern(request):
