@@ -1,4 +1,8 @@
 
+var c;
+var cX;
+var cY;
+
 var theta = Math.PI/6;
 var chWidth = 20;
 var chHeight = 10;
@@ -11,7 +15,6 @@ var curCluster;
 
 var rows = {};
 var nodes = {};
-var params = {};
 var rounds = false;
 
 
@@ -34,32 +37,64 @@ var STITCH_IMGS = {
 };
 $(function() {
 
+    c = $("canvas")[0].getContext("2d");
+    c.fillStyle = "gray";
+    c.globalAlpha = 0.5;
+    cX = $("canvas").attr("width")/2;
+    cY = $("canvas").attr("height")/2;
+    c.translate(cX, cY);
+
     //must begin by adding a row
     //every row must end with addCluster();
     addRow();
     addStitch(new Stitch("HDC"));
- //    addCluster();
- //    addStitch(new Stitch("HDC"));
- //    addCluster();
- //    addStitch(new Stitch("HDC"));
- //    addCluster();
- //    addStitch(new Stitch("HDC"));
- //    addCluster();
- //    addStitch(new Stitch("HDC"));
- //    addCluster();
- //    addStitch(new Stitch("HDC"));
- //    addCluster();
- // addStitch(new Stitch("HDC"));
- //    addCluster();
+    addCluster();
+    addStitch(new Stitch("HDC"));
+    addCluster();
+    addStitch(new Stitch("HDC"));
+    addCluster();
+    addStitch(new Stitch("HDC"));
+    addCluster();
+    addStitch(new Stitch("HDC"));
+    addCluster();
+    addStitch(new Stitch("HDC"));
+    addCluster();
+    addStitch(new Stitch("HDC"));
+    addCluster();
 
- //    addRow();
- //        addStitch(new Stitch("HDC"));
+    addRow();
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
 
- //    addStitch(new Stitch("HDC"));
- //    addStitch(new Stitch("HDC"));
- //    addStitch(new Stitch("HDC"));
- //    skipStitch();
- //    addStitch(new Stitch("HDC"));
+    skipStitch();
+    skipStitch();
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    skipStitch();
+    skipStitch();
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addRow();
+    skipStitch();
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    skipStitch();
+    skipStitch();
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    skipStitch();
+    skipStitch();
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    // skipStitch();
+    // skipStitch();
+    // addStitch(new Stitch("HDC"));
 
 });
 
@@ -98,18 +133,15 @@ $(function() {
             // if (slant * (stitch.origin.posX - stitch.prevStitch.origin.posX) > 0) {
             //     slantOffset = -slantOffset;
 
-            rotateStitch(stitch, stitch.origin,
-                -Math.PI/2 + (curAngle -slant*stitch.dir+ Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height)));
-
             var offset = Math.PI/2 - prevAngle - slant*stitch.dir- Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height);
-            if ((stitch.prevStitch.origin.posX - stitch.nodes[0].posX) * stitch.dir > 0) {
-                offset = -offset;
-            }
             if (rows[curX][stitch.prevStitch.cluster].length == 1 && stitch.prevStitch.cluster != 0) {
                 rotateStitchesInCluster(stitch.prevStitch.x, stitch.prevStitch.cluster, (offset - stitch.prevStitch.angle)/2);
             } else {
                 rotateStitchesInCluster(stitch.prevStitch.x, stitch.prevStitch.cluster, (offset - stitch.prevStitch.angle));
             }
+
+            rotateStitch(stitch, stitch.origin,
+                -Math.PI/2 + (curAngle -slant*stitch.dir+ Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height)));
 
         } else if (curY == 0 && !foundation) {
             var angle = -getStitchY(curX-1, rows[curX-1]['stitches'] - curCluster - 1).angle;
@@ -173,14 +205,14 @@ $(function() {
 
             } else {
                 rotateNextStitchInCluster(stitch);
-                if (curCluster == 0 && !foundation) {
+                if (rows[curX][curCluster][0].y == 0 && !foundation) {
                     rotateStitchesInCluster(curX, curCluster, -Math.atan(stitch.width/2 / stitch.height));
                 }
             }
         }
 
         curY++;
-        addToCanvas(stitch);
+        // addToCanvas(stitch);
 
     }
 
@@ -340,12 +372,13 @@ $(function() {
         //foundation will not get set to false until second row is added
         if (typeof curX != "undefined") {
             if (foundation) {
-                removeCluster();
                 foundation = false;
             }
             rows[curX]['clusters']++;
+
             curX++;
             toRight = !toRight;
+
         } else {
             //first node
             nodes[0] = {
@@ -362,6 +395,7 @@ $(function() {
             'clusters':0,
             'stitches':0
         };
+
 
     }
 
@@ -390,7 +424,6 @@ $(function() {
         */
         var midpt = midpoint(stitch.prevStitch.nodes[0], stitch.prevStitch.nodes[1]);
         var angle1 = Math.atan((midpt.posX - stitch.origin.posX) / (midpt.posY - stitch.origin.posY));
-        rotateStitch(stitch, stitch.origin, angle1 * stitch.dir);
         //average of previous and current stitches' angles from origin to top corners
         var angle2 = Math.atan(stitch.width/2 / stitch.height) +
             getAngleFromSides(
@@ -398,7 +431,7 @@ $(function() {
                 distance(stitch.origin, stitch.nodes[0]),
                 distance(midpt, stitch.nodes[0])
                 );
-        rotateStitch(stitch, stitch.origin, angle2);
+        rotateStitch(stitch, stitch.origin, angle1 * stitch.dir + angle2);
     }
 
     function rotateStitch(stitch, origin, angle) {
@@ -412,7 +445,7 @@ $(function() {
         if (stitch.y == 0) {
             rotateNode(stitch.nodes[0], origin, angle);
         }
-        addToCanvas(stitch);
+        restoreCanvasToStitch(stitch);
     }
 
     function rotateStitchesInCluster(row, clusterNum, angle) {
@@ -423,15 +456,22 @@ $(function() {
         */
         var cluster = rows[row][clusterNum];
         var origin = cluster[0].origin;
-        if (clusterNum == 0 || cluster.length == 1) {
-            for (stitch in cluster) {
+        // rotateStitch(cluster[0], origin, angle);
+        if (rows[row][clusterNum][0].y == 0 || cluster.length == 1) {
+            for (stitch in cluster) {//.slice(1)) {
                 rotateStitch(cluster[stitch], origin, angle);
             }
         } else {
-            for (stitch in cluster) {
-                rotateStitch(cluster[stitch], origin, angle / (cluster.length - 1) * stitch);
+            for (stitch in cluster) {//.slice(1)) {
+                rotateStitch(cluster[stitch], origin, angle / (cluster.length - 1) * (stitch));
             }
         }
+
+
+
+        // if (clusterNum == 0 || cluster.length == 1) {
+        // } else {
+        // }
     }
 
     function rotateNode(node, origin, angle) {
@@ -500,6 +540,7 @@ $(function() {
         this.origin;
         this.x;
         this.y;
+        this.params;
         this.cluster;
         if (stitch != "CH") {
         this.width = STITCH_IMGS[this.stType]["WIDTH"];
@@ -512,25 +553,10 @@ $(function() {
         this.left;
         this.div = $("<div></div>");
         var self = this;
-        this.div.css('position', 'absolute');
-        if (stitch!="CH") {
-            this.div.css({
-                "background-color":"gray",
-                "opacity":"0.5",
-                "border":"solid gray 1px"
-            });
-        }
-
         this.setOrigin = setOrigin;
 
         function setOrigin() {
             this.origin = midpoint(this.nodes[2], this.nodes[3]);
-                this.div.css({"transform-origin":"50% 100%",
-                    "-ms-transform-origin":"50% 100%", /* IE 9 */
-                    "-webkit-transform-origin":"50% 100%", /* Safari and Chrome */
-                    "-moz-transform-origin":"50% 100%", /* Firefox */
-                    "-o-transform-origin":"50% 100%", /* Opera */
-                });
 
         }
     }
@@ -538,6 +564,7 @@ $(function() {
         this.stType = "ch";
         this.x;
         this.y;
+        this.params;
         this.cluster;
         this.chIndex;
         this.stitch;
@@ -566,34 +593,44 @@ $(function() {
     }
 
     function addToCanvas(stitch) {
-        var self = stitch;
-        if (stitch.stType == "ch") {
-            stitch.div.css("top",stitch.top);
-            stitch.stitch.div.append(stitch.div);
-        } else {
-            if (stitch.stType == "CH") {
-                for (ch in stitch.chains) {
-                    addToCanvas(stitch.chains[ch]);
-                }
+
+        if (stitch.y == 0 && stitch.prevStitch!=null) {
+            cY -= stitch.prevStitch.height;
+            c.translate(0, -stitch.prevStitch.height);
+        }
+
+        if (stitch.y != 0 && rows[stitch.x][stitch.cluster][0] == stitch) {
+            cX += stitch.dir * distance(stitch.origin, stitch.prevStitch.origin);
+            c.translate(stitch.dir * distance(stitch.origin, stitch.prevStitch.origin), 0);
+        }
+
+        c.rotate(stitch.dir*stitch.angle);
+        c.fillRect(-stitch.width / 2, -stitch.height, stitch.width, stitch.height);
+        c.rotate(-stitch.dir*stitch.angle);
+    }
+
+
+    function restoreCanvasToStitch(stitch) {
+    //draws everything back including stitch in its new position
+
+        c.translate(-cX, -cY);
+        c.clearRect(0, 0, $("canvas")[0].width, $("canvas")[0].height);
+        cX = $("canvas").attr("width")/2;
+        cY = $("canvas").attr("height")/2;
+        c.translate(cX, cY);
+        for (var i=0; i < stitch.x; i++) {
+            for (var j=0; j < rows[i]['stitches']; j++) {
+                addToCanvas(getStitchY(i, j));
             }
-            stitch.div.css("top", 600-stitch.top);
-            $("#interface").append(stitch.div);
+
+        }
+        j = 0;
+        while (j <= stitch.y) {
+            addToCanvas(getStitchY(i, j));
+            j++;
         }
 
-        if (Math.abs(stitch.angle) < 1e-5) {
-            stitch.angle = 0;
-        }
-            stitch.div.css({
-                "left":stitch.left,
-                "width":stitch.width,
-                "height":stitch.height,
-                "transform": "rotate("+stitch.dir*stitch.angle*180/Math.PI+"deg)",
-                "-ms-transform": "rotate("+stitch.dir*stitch.angle*180/Math.PI+"deg)", /* IE 9 */
-                "-webkit-transform": "rotate("+stitch.dir*stitch.angle*180/Math.PI+"deg)", /* Safari and Chrome */
-                "-moz-transform": "rotate("+stitch.dir*stitch.angle*180/Math.PI+"deg)", /* Firefox */
-                "-o-transform": "rotate("+stitch.dir*stitch.angle*180/Math.PI+"deg)" /* Opera */
-            });
-
+        console.log("restored to stitch " + i+" "+j);
 
     }
 
