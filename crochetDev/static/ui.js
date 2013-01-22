@@ -1,5 +1,7 @@
 
-
+var theta = Math.PI/6;
+var chWidth = 20;
+var chHeight = 10;
 var foundation = true;
 var toRight;
 
@@ -9,6 +11,7 @@ var curCluster;
 
 var rows = {};
 var nodes = {};
+var params = {};
 var rounds = false;
 
 
@@ -33,35 +36,30 @@ $(function() {
 
     //must begin by adding a row
     //every row must end with addCluster();
-    // addRow();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
+    addRow();
+    addStitch(new Stitch("HDC"));
+ //    addCluster();
+ //    addStitch(new Stitch("HDC"));
+ //    addCluster();
+ //    addStitch(new Stitch("HDC"));
+ //    addCluster();
+ //    addStitch(new Stitch("HDC"));
+ //    addCluster();
+ //    addStitch(new Stitch("HDC"));
+ //    addCluster();
+ //    addStitch(new Stitch("HDC"));
+ //    addCluster();
+ // addStitch(new Stitch("HDC"));
+ //    addCluster();
 
-    // addRow();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
-    // addStitch(new Stitch("HDC"));
-    // addCluster();
-    // addRow();
+ //    addRow();
+ //        addStitch(new Stitch("HDC"));
 
-
-
+ //    addStitch(new Stitch("HDC"));
+ //    addStitch(new Stitch("HDC"));
+ //    addStitch(new Stitch("HDC"));
+ //    skipStitch();
+ //    addStitch(new Stitch("HDC"));
 
 });
 
@@ -79,7 +77,7 @@ $(function() {
 
         rows[curX][curCluster].push(stitch);
         addNode(stitch);
-        
+
 
         if (rows[curX][curCluster][0] == stitch && curY!=0) {
             //logic for calculating angles between clusters
@@ -118,16 +116,83 @@ $(function() {
             //var angle = -stitch.prevStitch.angle;
             rotateStitch(stitch, stitch.origin, angle);
         } else if (!foundation) {
-            rotateNextStitchInCluster(stitch);
-            if (curCluster == 0 && !foundation) {
-                rotateStitchesInCluster(curX, curCluster, -Math.atan(stitch.width/2 / stitch.height));
-            }
 
+
+            if (stitch.prevStitch.stType == 'CH') {
+                var chain = stitch.prevStitch;
+                var angle = chain.chains.length * theta;
+                // rotateStitch(stitch, stitch.origin, chain.prevStitch.angle);
+                // rotateStitch(stitch, stitch.origin, angle);
+
+                if (chain.prevStitch.x == chain.x) {
+                    var chord = getSideFromAngle(
+                        chain.prevStitch.height,
+                        stitch.height,
+                        angle
+                        );
+                    // chain.left -= (chord - chain.width)/2;
+                    // chain.width = chord;
+                    // rotateStitch(chain, chain.origin, -chain.angle);
+                    // rotateNextStitchInCluster(chain);
+                    adjustChWidth(chain, chord);
+                    rotateNextStitchInCluster(stitch);
+
+                    console.log(chord);
+                    console.log(distance(chain.nodes[0], chain.nodes[1]));
+
+                    var slant = Math.atan((chain.nodes[1].posY - chain.nodes[0].posY) /
+                        (chain.nodes[1].posX - chain.nodes[0].posX) );
+                    var midpt = midpoint(chain.nodes[0], chain.nodes[1]);
+                    var midpt2 = {
+                        'posX':Math.abs((chain.nodes[1].posX - chain.nodes[0].posX))/2,
+                        'posY':Math.abs((chain.nodes[1].posY - chain.nodes[0].posY))/2
+                    }
+                    var radius = Math.sqrt(Math.pow(chord,2) + Math.pow(chWidth,2))/2;
+                    var chAngle = getAngleFromSides(radius, radius, chWidth);
+
+                    for (ch in chain.chains) {
+                        chain.chains[ch].top = midpt2.posY - chHeight/2;
+                        chain.chains[ch].left = midpt2.posX - chWidth/2;
+                        chain.chains[ch].div.css({
+                            "top":0,//chain.chains[ch].top,
+                            "left":chain.chains[ch].left,
+                            "-ms-transform-origin":"50% "+radius+"px", /* IE 9 */
+                            "-webkit-transform-origin":"50% "+radius+"px", /* Safari and Chrome */
+                            "-moz-transform-origin":"50% "+radius+"px", /* Firefox */
+                            "-o-transform-origin":"50% "+radius+"px" /* Opera */
+                        });
+                        //rotateChain(chain.chains[ch], -Math.PI/2 + chAngle/2);
+                        rotateChain(chain.chains[ch], chAngle * (parseInt(chain.chains.length/2) - parseInt(ch)));
+                    }
+
+
+                }
+
+
+
+
+            } else {
+                rotateNextStitchInCluster(stitch);
+                if (curCluster == 0 && !foundation) {
+                    rotateStitchesInCluster(curX, curCluster, -Math.atan(stitch.width/2 / stitch.height));
+                }
+            }
         }
 
         curY++;
         addToCanvas(stitch);
 
+    }
+
+    function rotateChain(ch, angle) {
+        ch.angle += angle;
+            ch.div.css({
+                "transform": "rotate("+ch.dir*ch.angle*180/Math.PI+"deg)",
+                "-ms-transform": "rotate("+ch.dir*ch.angle*180/Math.PI+"deg)", /* IE 9 */
+                "-webkit-transform": "rotate("+ch.dir*ch.angle*180/Math.PI+"deg)", /* Safari and Chrome */
+                "-moz-transform": "rotate("+ch.dir*ch.angle*180/Math.PI+"deg)", /* Firefox */
+                "-o-transform": "rotate("+ch.dir*ch.angle*180/Math.PI+"deg)" /* Opera */
+            });
     }
 
     function addNode(stitch) {
@@ -238,8 +303,16 @@ $(function() {
         chain.chIndex = stitch.chains.length - 1;
         chain.cluster = curCluster;
 
-        chain.top = 0;
-        chain.left = chain.width * chain.chIndex;
+        adjustChWidth(stitch, chWidth*(chain.chIndex+1));
+        chain.top = -chain.height/2;
+        if (chain.dir == 1) {
+            chain.left = chain.width * chain.chIndex;
+        } else {
+            for (ch in stitch.chains.slice(0, chain.chIndex)) {
+                stitch.chains[ch].left += chain.width;
+            }
+            chain.left = stitch.width - chain.width * (chain.chIndex+1);
+        }
 
 
         if (chain.stitch.angle > 0) {
@@ -249,24 +322,19 @@ $(function() {
             nodes[curX+1][curY+1].posX += chain.width * Math.cos(chain.stitch.angle)*chain.dir;
             nodes[curX+1][curY+1].posY += chain.width * Math.sin(Math.abs(chain.stitch.angle));
         }
-
-        addToCanvas(chain);
-    }
-
-    function addChNode(chain) {
-
-
-        if (stitch.angle > 0) {
-            nodes[curX+1][curY+1] = new Node(nodes[curX][curY].posX + stitchNum * stitch.width * Math.cos(prevAngle)*stitch.dir,
-                nodes[curX][curY].posY - stitchNum * stitch.width * Math.sin(prevAngle));
-        } else {
-            nodes[curX+1][curY+1] = new Node(nodes[curX][curY].posX + stitchNum * stitch.width * Math.cos(prevAngle)*stitch.dir,
-                nodes[curX][curY].posY + stitchNum * stitch.width * Math.sin(prevAngle));
-        }
-
         stitch.nodes[0] = nodes[curX+1][curY];
         stitch.nodes[1] = nodes[curX+1][curY+1];
+
+        addToCanvas(stitch);
     }
+
+    function adjustChWidth(stitch, width) {
+        stitch.left -= (width - stitch.width)/2;
+        stitch.width = width;
+        rotateStitch(stitch, stitch.origin, -stitch.angle);
+        rotateNextStitchInCluster(stitch);
+    }
+
 
     function addRow() {
         //foundation will not get set to false until second row is added
@@ -448,7 +516,8 @@ $(function() {
         if (stitch!="CH") {
             this.div.css({
                 "background-color":"gray",
-                "opacity":"0.5"
+                "opacity":"0.5",
+                "border":"solid gray 1px"
             });
         }
 
@@ -488,10 +557,10 @@ $(function() {
                 "background-color":"gray",
                 "border":"solid gray 1px",
                 "opacity":"0.5",
-                "-ms-transform-origin":"0 0", /* IE 9 */
-                "-webkit-transform-origin":"0 0", /* Safari and Chrome */
-                "-moz-transform-origin":"0 0", /* Firefox */
-                "-o-transform-origin":"0 0" /* Opera */
+                "-ms-transform-origin":"0% 50%", /* IE 9 */
+                "-webkit-transform-origin":"0% 50%", /* Safari and Chrome */
+                "-moz-transform-origin":"0% 50%", /* Firefox */
+                "-o-transform-origin":"0% 50%" /* Opera */
         });
 
     }
@@ -500,7 +569,13 @@ $(function() {
         var self = stitch;
         if (stitch.stType == "ch") {
             stitch.div.css("top",stitch.top);
+            stitch.stitch.div.append(stitch.div);
         } else {
+            if (stitch.stType == "CH") {
+                for (ch in stitch.chains) {
+                    addToCanvas(stitch.chains[ch]);
+                }
+            }
             stitch.div.css("top", 600-stitch.top);
             $("#interface").append(stitch.div);
         }
