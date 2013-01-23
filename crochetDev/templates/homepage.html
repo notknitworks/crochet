@@ -3,7 +3,7 @@
 	<!--<script src="account.js"></script>-->
 	<!-- for testing purposes
 	<ling rel="stylesheet" type="text/css" href="base.css" -->
-	<link rel="stylesheet" type="text/css" href="https://s3.amazonaws.com/nehastephcrochet/base.css">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}base.css">
 </head>
 
 <body>
@@ -11,6 +11,7 @@
 	
 {% if user.is_authenticated %}
 	<p>You are currently logged in as {{ user.username }}.</p>
+	<a href="/account/{{ user.username }}">Go to my page.</a>
 	<form action="/accounts/logout/" method="get">
       <input type="submit" value="Logout"\>
     </form>
@@ -21,7 +22,7 @@
 			<input type="password" name="password" placeholder="password">
 		</div>
 		<div id="right">
-			<input type="hidden" name="next" value="{{ next }}" />
+			<input type="hidden" name="next" value="{{next}}" />
 			<input type="submit" value="Login">
 		</div>
 	</form>
@@ -31,9 +32,12 @@
 	
 		<form action="/create/" method="post"> {% csrf_token %}
 			<h4>Create an account</h4>
+			<input type="text" name="first_name" placeholder="first name">
+			<input type="text" name="last_name" placeholder="last name">
+			<input type="text" name="email" placeholder="email">
 			<input type="text" name="username" id="username" placeholder="username">
 			<span id="available">{{ available }} </span>
-			<input type="text" name="password" placeholder="password">
+			<input type="password" name="password" placeholder="password">
 			<input type="submit" value="Create Account">
 		</form>
 </body>

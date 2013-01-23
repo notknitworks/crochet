@@ -146,6 +146,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crochetDev.patterns',
+    'crochetDev.members',
     'storages'
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',

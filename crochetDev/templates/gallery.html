@@ -1,0 +1,45 @@
+<html>
+<head>
+</head>
+
+<body>
+	{% if request.user %}
+
+	<h1>{{viewing.username}}'s Gallery</h1>
+
+	<ul>
+		{% for name in request.session.pattern_names %}
+
+			<li> {{ name }} </li>
+
+		{% endfor %}
+	</ul>
+
+	{% if unpublished %}
+		<h2> Unpublished patterns (only visible to you) </h2>
+		<ul>
+			{% for pattern in unpublished %}
+
+				<li> {{ pattern.name }} </li>
+
+			{% endfor %}
+		</ul>
+	{% endif %}
+
+	{% if messages %}
+		<h2> Your Messages </h2>
+		<ul>
+			{% for message in messages %}
+
+				<li> <b> {{message.sender.username}} </b> to  <b> {{message.receiver.username}} </b>on {{message.date_sent|date}}:
+					{{ message.content }} 
+				</li>
+
+			{% endfor %}
+		</ul>
+
+	{% endif %}
+
+	{% endif %}
+</body>
+</html>
