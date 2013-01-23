@@ -60,4 +60,4 @@ class Stitch(models.Model):
     width = models.PositiveSmallIntegerField()
 
     def __unicode__(self):
-    	return self.user.username + " created a stitch called " + self.name
+    	return self.user.username + " created_patternsd a stitch called " + self.name

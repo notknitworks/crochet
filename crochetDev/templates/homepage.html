@@ -32,9 +32,12 @@
 	
 		<form action="/create/" method="post"> {% csrf_token %}
 			<h4>Create an account</h4>
+			<input type="text" name="first_name" placeholder="first name">
+			<input type="text" name="last_name" placeholder="last name">
+			<input type="text" name="email" placeholder="email">
 			<input type="text" name="username" id="username" placeholder="username">
 			<span id="available">{{ available }} </span>
-			<input type="text" name="password" placeholder="password">
+			<input type="password" name="password" placeholder="password">
 			<input type="submit" value="Create Account">
 		</form>
 </body>

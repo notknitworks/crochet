@@ -22,7 +22,13 @@ def createUser(request):
 	if request.method == 'POST':
 		username = request.POST['username']
 		password = request.POST['password']
+		first_name = request.POST['first_name']
+		last_name = request.POST['last_name']
+		email = request.POST['email']
 		user = User.objects.create_user(username=username,password=password)
+		user.first_name = first_name
+		user.last_name = last_name
+		user.email = email
 		user.save()
 		return loginuser(request)
 	return render_to_response("userpage.html", {}, RequestContext(request))
@@ -83,6 +89,7 @@ def loginuser(request):
 				
 				return redirect("/account/" + username)
 			else:
+				#user's account has been deactivated
 				return render_to_response("homepage.html", {}, RequestContext(request))
 		else:
 			return render_to_response("userpage.html", {}, RequestContext(request))
