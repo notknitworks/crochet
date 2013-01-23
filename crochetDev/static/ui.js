@@ -65,33 +65,38 @@ $(function() {
     addRow();
     addStitch(new Stitch("HDC"));
     addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
 
-    skipStitch();
-    skipStitch();
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    skipStitch();
-    skipStitch();
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    addRow();
-    skipStitch();
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    skipStitch();
-    skipStitch();
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    skipStitch();
-    skipStitch();
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
+    // skipStitch();
+    // skipStitch();
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    // skipStitch();
+    // skipStitch();
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    // addRow();
+    // skipStitch();
+    // // skipStitch();
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    // // skipStitch();
+    // skipStitch();
+    // skipStitch();
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    // skipStitch();
+    // skipStitch();
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    addChain();
+    addChain();
+    addChain();
     // skipStitch();
     // skipStitch();
     // addStitch(new Stitch("HDC"));
@@ -129,10 +134,6 @@ $(function() {
 
             var angleBefore = stitch.prevStitch.angle - prevOriginStitch.angle;
 
-            // var slantOffset = slant;
-            // if (slant * (stitch.origin.posX - stitch.prevStitch.origin.posX) > 0) {
-            //     slantOffset = -slantOffset;
-
             var offset = Math.PI/2 - prevAngle - slant*stitch.dir- Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height);
             if (rows[curX][stitch.prevStitch.cluster].length == 1 && stitch.prevStitch.cluster != 0) {
                 rotateStitchesInCluster(stitch.prevStitch.x, stitch.prevStitch.cluster, (offset - stitch.prevStitch.angle)/2);
@@ -140,21 +141,21 @@ $(function() {
                 rotateStitchesInCluster(stitch.prevStitch.x, stitch.prevStitch.cluster, (offset - stitch.prevStitch.angle));
             }
 
-            rotateStitch(stitch, stitch.origin,
+            rotateStitchAdd(stitch,
                 -Math.PI/2 + (curAngle -slant*stitch.dir+ Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height)));
 
         } else if (curY == 0 && !foundation) {
             var angle = -getStitchY(curX-1, rows[curX-1]['stitches'] - curCluster - 1).angle;
             //var angle = -stitch.prevStitch.angle;
-            rotateStitch(stitch, stitch.origin, angle);
+            rotateStitchAdd(stitch, angle);
         } else if (!foundation) {
 
 
             if (stitch.prevStitch.stType == 'CH') {
                 var chain = stitch.prevStitch;
                 var angle = chain.chains.length * theta;
-                // rotateStitch(stitch, stitch.origin, chain.prevStitch.angle);
-                // rotateStitch(stitch, stitch.origin, angle);
+                // rotateStitch(stitch, chain.prevStitch.angle);
+                // rotateStitch(stitch, angle);
 
                 if (chain.prevStitch.x == chain.x) {
                     var chord = getSideFromAngle(
@@ -164,7 +165,7 @@ $(function() {
                         );
                     // chain.left -= (chord - chain.width)/2;
                     // chain.width = chord;
-                    // rotateStitch(chain, chain.origin, -chain.angle);
+                    // rotateStitch(chain, -chain.angle);
                     // rotateNextStitchInCluster(chain);
                     adjustChWidth(chain, chord);
                     rotateNextStitchInCluster(stitch);
@@ -185,23 +186,13 @@ $(function() {
                     for (ch in chain.chains) {
                         chain.chains[ch].top = midpt2.posY - chHeight/2;
                         chain.chains[ch].left = midpt2.posX - chWidth/2;
-                        chain.chains[ch].div.css({
-                            "top":0,//chain.chains[ch].top,
-                            "left":chain.chains[ch].left,
-                            "-ms-transform-origin":"50% "+radius+"px", /* IE 9 */
-                            "-webkit-transform-origin":"50% "+radius+"px", /* Safari and Chrome */
-                            "-moz-transform-origin":"50% "+radius+"px", /* Firefox */
-                            "-o-transform-origin":"50% "+radius+"px" /* Opera */
-                        });
+
                         //rotateChain(chain.chains[ch], -Math.PI/2 + chAngle/2);
                         rotateChain(chain.chains[ch], chAngle * (parseInt(chain.chains.length/2) - parseInt(ch)));
                     }
 
 
                 }
-
-
-
 
             } else {
                 rotateNextStitchInCluster(stitch);
@@ -273,8 +264,6 @@ $(function() {
             nodes[curX+1][curY+1] = new Node(origin.posX + offset,
                 origin.posY+stitch.height, curX+1, curY+1);
         } else {
-            // nodes[curX+1][curY+1] = new Node(origin.posX + offset,
-            //     origin.posY+Math.max(stitch.prevStitch.height, 0), curX+1, curY+1);
             nodes[curX+1][curY+1] = new Node(nodes[curX+1][curY].posX,
                 nodes[curX+1][curY].posY, curX+1, curY+1);
         }
@@ -312,7 +301,9 @@ $(function() {
             stitch.height = stitch.prevStitch.height;
 
             addNode(stitch);
-            rotateNextStitchInCluster(stitch);
+            // rotateNextStitchInCluster(stitch);
+            rotateStitchAdd(stitch, stitch.prevStitch.angle);
+
             alignNodes(stitch.nodes[1], stitch.nodes[0]);
         }
         addChainTo(stitch);
@@ -322,51 +313,23 @@ $(function() {
     }
 
     function addChainTo(stitch) {
-        var chain = new Chain();
-        if (!toRight) {
-            chain.dir *= -1;
-        }
-        stitch.chains.push(chain);
-        chain.stitch = stitch;
-        stitch.div.append(chain.div);
+        var chain = new Chain(stitch);
 
         chain.x = curX;
         chain.y = curY;
         chain.chIndex = stitch.chains.length - 1;
         chain.cluster = curCluster;
 
-        adjustChWidth(stitch, chWidth*(chain.chIndex+1));
-        chain.top = -chain.height/2;
-        if (chain.dir == 1) {
-            chain.left = chain.width * chain.chIndex;
-        } else {
-            for (ch in stitch.chains.slice(0, chain.chIndex)) {
-                stitch.chains[ch].left += chain.width;
-            }
-            chain.left = stitch.width - chain.width * (chain.chIndex+1);
-        }
-
-
-        if (chain.stitch.angle > 0) {
-            nodes[curX+1][curY+1].posX += chain.width * Math.cos(chain.stitch.angle)*chain.dir;
-            nodes[curX+1][curY+1].posY -= chain.width * Math.sin(chain.stitch.angle);
-        } else {
-            nodes[curX+1][curY+1].posX += chain.width * Math.cos(chain.stitch.angle)*chain.dir;
-            nodes[curX+1][curY+1].posY += chain.width * Math.sin(Math.abs(chain.stitch.angle));
-        }
-        stitch.nodes[0] = nodes[curX+1][curY];
-        stitch.nodes[1] = nodes[curX+1][curY+1];
-
-        addToCanvas(stitch);
+        adjustChWidth(stitch, chWidth * (chain.chIndex+1));
     }
 
     function adjustChWidth(stitch, width) {
-        stitch.left -= (width - stitch.width)/2;
+        rotateStitch(stitch, -stitch.angle);
+        nodes[curX+1][curY+1].posX += (stitch.width - width)/2;
         stitch.width = width;
-        rotateStitch(stitch, stitch.origin, -stitch.angle);
-        rotateNextStitchInCluster(stitch);
+        removeStitchesAfter(stitch);
+        rotateStitch(stitch, stitch.prevStitch.angle);
     }
-
 
     function addRow() {
         //foundation will not get set to false until second row is added
@@ -418,6 +381,17 @@ $(function() {
         }
     }
 
+    function removeStitchesAfter(stitch) {
+        //also deletes current stitch
+        if (stitch.y > 0) {
+            restoreCanvasToStitch(getStitchY(stitch.x, stitch.y - 1))
+        } else if (stitch.x > 0) {
+            restoreCanvasToStitch(getStitchY(stitch.x-1, rows[stitch.x-1]['stitches']-1));
+        } else {
+            restoreCanvasToStitch({ x:-1, y:-1});
+        }
+    }
+
     function rotateNextStitchInCluster(stitch) {
         /*
         *Function to line up next stitch in a cluster with the corner of the previous.
@@ -431,22 +405,31 @@ $(function() {
                 distance(stitch.origin, stitch.nodes[0]),
                 distance(midpt, stitch.nodes[0])
                 );
-        rotateStitch(stitch, stitch.origin, angle1 * stitch.dir + angle2);
+        rotateStitchAdd(stitch, angle1 * stitch.dir + angle2);
     }
 
-    function rotateStitch(stitch, origin, angle) {
+    function rotateStitch(stitch, angle) {
         /*
         *Rotates stitch by some angle. Positive angle direction is direction in which stitch faces.
         *Rotates nodes[1] by angle as well. Nodes[0] is also rotated if first in row.
         */
-        stitch.angle += angle;
-        angle *= stitch.dir;
-        rotateNode(stitch.nodes[1], origin, angle);
-        if (stitch.y == 0) {
-            rotateNode(stitch.nodes[0], origin, angle);
-        }
+        rotateStitchNodes(stitch, angle);
         restoreCanvasToStitch(stitch);
     }
+
+    function rotateStitchAdd(stitch, angle) {
+        rotateStitchNodes(stitch, angle);
+        addToCanvas(stitch);
+    }
+    function rotateStitchNodes(stitch, angle) {
+        stitch.angle += angle;
+        angle *= stitch.dir;
+        rotateNode(stitch.nodes[1], stitch.origin, angle);
+        if (stitch.y == 0) {
+            rotateNode(stitch.nodes[0], stitch.origin, angle);
+        }
+    }
+
 
     function rotateStitchesInCluster(row, clusterNum, angle) {
         /*
@@ -455,23 +438,16 @@ $(function() {
         *if one stitch in cluster, or if first in row, entire cluster will rotate by angle.
         */
         var cluster = rows[row][clusterNum];
-        var origin = cluster[0].origin;
         // rotateStitch(cluster[0], origin, angle);
         if (rows[row][clusterNum][0].y == 0 || cluster.length == 1) {
             for (stitch in cluster) {//.slice(1)) {
-                rotateStitch(cluster[stitch], origin, angle);
+                rotateStitch(cluster[stitch], angle);
             }
         } else {
             for (stitch in cluster) {//.slice(1)) {
-                rotateStitch(cluster[stitch], origin, angle / (cluster.length - 1) * (stitch));
+                rotateStitch(cluster[stitch], angle / (cluster.length - 1) * (stitch));
             }
         }
-
-
-
-        // if (clusterNum == 0 || cluster.length == 1) {
-        // } else {
-        // }
     }
 
     function rotateNode(node, origin, angle) {
@@ -549,8 +525,6 @@ $(function() {
         this.nodes = {};
         this.angle = 0;
         this.dir = 1;
-        this.top;
-        this.left;
         this.div = $("<div></div>");
         var self = this;
         this.setOrigin = setOrigin;
@@ -560,53 +534,77 @@ $(function() {
 
         }
     }
-    function Chain() {
+    function Chain(stitch) {
         this.stType = "ch";
         this.x;
         this.y;
         this.params;
         this.cluster;
         this.chIndex;
-        this.stitch;
+        this.stitch = stitch;
+        this.stitch.chains.push(this);
         this.prevChain;
-        this.top;
-        this.left;
-        this.dir = 1;
+        this.dir = stitch.dir;
         this.angle = 0;
         this.nodes = {};
         this.width = STITCH_IMGS["ch"]["WIDTH"];
         this.height = STITCH_IMGS["ch"]["HEIGHT"];
         var self = this;
-        this.div = $("<div></div>");
-        this.div.css({'position':'absolute',
-                "width":self.width,
-                "height":self.height,
-                "background-color":"gray",
-                "border":"solid gray 1px",
-                "opacity":"0.5",
-                "-ms-transform-origin":"0% 50%", /* IE 9 */
-                "-webkit-transform-origin":"0% 50%", /* Safari and Chrome */
-                "-moz-transform-origin":"0% 50%", /* Firefox */
-                "-o-transform-origin":"0% 50%" /* Opera */
-        });
 
     }
 
     function addToCanvas(stitch) {
 
-        if (stitch.y == 0 && stitch.prevStitch!=null) {
-            cY -= stitch.prevStitch.height;
-            c.translate(0, -stitch.prevStitch.height);
+        // if (stitch.y == 0 && stitch.prevStitch!=null) {
+        //     cY -= stitch.prevStitch.height;
+        //     c.translate(0, -stitch.prevStitch.height);
+        // }
+
+        var prevOrigin;
+        if (rows[stitch.x][stitch.cluster][0] == stitch && !(stitch.y == 0 && stitch.x == 0)) {
+            if (stitch.y != 0) {
+                prevOrigin = stitch.prevStitch.origin;
+            } else if (stitch.x != 0) {
+                prevOrigin = getStitchY(stitch.x-1, rows[stitch.x-1]['stitches']-1).origin;
+                //midpoint(getStitchY(stitch.x - 1, rows[stitch.x-1]['stitches']-1).nodes[2],
+                // getStitchY(stitch.x - 1, rows[stitch.x-1]['stitches']-1).nodes[3]);
+            }
+            cX += stitch.origin.posX - prevOrigin.posX;
+            cY -= stitch.origin.posY - prevOrigin.posY
+            c.translate(stitch.origin.posX - prevOrigin.posX,
+                -(stitch.origin.posY - prevOrigin.posY));
         }
 
-        if (stitch.y != 0 && rows[stitch.x][stitch.cluster][0] == stitch) {
-            cX += stitch.dir * distance(stitch.origin, stitch.prevStitch.origin);
-            c.translate(stitch.dir * distance(stitch.origin, stitch.prevStitch.origin), 0);
-        }
+        if (stitch.stType == "CH") {
+            if (getStitchY(stitch.x, rows[stitch.x]['stitches']-1) == stitch) {
+                addHangingChains(stitch);
+            }
 
-        c.rotate(stitch.dir*stitch.angle);
-        c.fillRect(-stitch.width / 2, -stitch.height, stitch.width, stitch.height);
+        } else {
+            c.rotate(stitch.dir*stitch.angle);
+            c.fillRect(-stitch.width / 2, -stitch.height, stitch.width, stitch.height);
+            c.rotate(-stitch.dir*stitch.angle);
+            c.save();
+        }
+    }
+
+    function addHangingChains(stitch) {
+        xOffset = (stitch.width + stitch.prevStitch.width)/2 * stitch.dir * Math.cos(Math.abs(stitch.angle));
+        yOffset = (stitch.width + stitch.prevStitch.width)/2 * Math.sin(stitch.angle);
+        c.translate(xOffset, yOffset);
+        c.rotate(stitch.dir * stitch.angle);
+        for (ch in stitch.chains) {
+            if (stitch.dir == 1) {
+                c.fillRect(-stitch.dir*(stitch.width / 2 - parseInt(ch)*stitch.chains[ch].width), -stitch.height - stitch.chains[ch].height/2,
+                stitch.chains[ch].width, stitch.chains[ch].height);
+            } else {
+                c.fillRect(-stitch.dir*(stitch.width / 2 - (parseInt(ch)+1)*stitch.chains[ch].width), -stitch.height - stitch.chains[ch].height/2,
+                stitch.chains[ch].width, stitch.chains[ch].height);
+            }
+        }
+        // c.fillRect(-stitch.width/2, -stitch.height, stitch.width, stitch.height);
         c.rotate(-stitch.dir*stitch.angle);
+        c.translate(-xOffset, -yOffset);
     }
 
 
