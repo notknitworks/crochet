@@ -8,10 +8,11 @@
 
 <body>
 	<h1>Welcome to stitch-it!</h1>
+	<a href="/newsfeed/">Browse Projects</a>
 	
 {% if user.is_authenticated %}
 	<p>You are currently logged in as {{ user.username }}.</p>
-	<a href="/account/{{ user.username }}">Go to my page.</a>
+	<a href="/{{ user.username }}">Go to my page.</a>
 	<form action="/accounts/logout/" method="get">
       <input type="submit" value="Logout"\>
     </form>

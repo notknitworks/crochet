@@ -20,8 +20,6 @@ from django.views.decorators.cache import cache_control
 def showgallery(request, name):
 	user = request.user
 	viewuser = User.objects.filter(username=name)[0] #there should only be one user per username
-	if user is None:
-		return HttpResponse("You are not logged in!")
 
 	values = {'viewing':viewuser}
 
@@ -35,26 +33,26 @@ def showgallery(request, name):
 		unpublished = Pattern.objects.filter(user=viewuser,date_published__isnull=True)
 		values['unpublished'] = unpublished
 	else:
-		followers = [connection.followed for connection in user.following.all()]
+		if user.is_authenticated():
+			followers = [connection.followed for connection in user.following.all()]
 
-		if viewuser in followers:
-			values['following'] = True
-		else:
-			values['following'] = False
+			if viewuser in followers:
+				values['following'] = True
+			else:
+				values['following'] = False
 
 
 	return render_to_response("gallery.html", values, RequestContext(request))
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def shownewsfeed(request):
-	if not request.user.is_authenticated:
-		return render_to_response("newsfeed.html", {}, RequestContext(request))
-
-
 	values = {}
-
 	patternset = Pattern.objects.filter(date_published__isnull=False)
-	needsort = 'sort' in request.GET
+
+	if not request.user.is_authenticated:
+		patternset = patternset.order_by('-date_published')
+		values['patternset'] = patternset
+		return render_to_response("newsfeed.html", values, RequestContext(request))
 
 	if 'filter_people' in request.GET:
 		people = request.GET['filter_people']
@@ -62,38 +60,64 @@ def shownewsfeed(request):
 			connections = request.user.following.all()	# list of connections for which user is the follower
 			following = [connection.followed for connection in connections] # list of the users that this user is following
 			patternset = patternset.filter(user__in=following)
+			values['following'] = 'checked'
+		else:
+			values['allpeople'] = 'checked'
+	else:
+		values['allpeople'] = 'checked'
 
 	now = datetime.now()
 	if 'filter_interval' in request.GET:
 		time = request.GET['filter_interval']
-		delta = timedelta(hours=1)
+		delta = datetime.now()
 		if time == 'hour':
 			delta = timedelta(hours=1)
+			patternset = patternset.filter(date_created__range=[now-delta, now])
+			values['hours'] = 'checked'
 		elif time == 'day':
 			delta = timedelta(days=1)
-		patternset = patternset.filter(date_created__range=[now-delta, now])
+			patternset = patternset.filter(date_created__range=[now-delta, now])
+			values['days'] = 'checked'
+		else:
+			values['alltime'] = 'checked'
+	else:
+		values['alltime'] = 'checked'
+		
 
 	if 'search' in request.GET:
 		words = request.GET['search']
-		wordset = words.split(" ")
+		if words != "":
 
-		tagset = Tags.objects.filter(content__iexact__in=wordset)
-		countlist = tags.values_list('pattern', flat=True).annotate(count=Count('pattern')).order_by('-count')
-		countlist = list(countlist)
+			wordset = words.split(" ")
+			values['words'] = words
 
-		patternset = patternset.filter(id__in=countlist)
+			tagset = Tag.objects.filter(content__in=wordset)
+			countlist = tagset.values_list('pattern', flat=True).annotate(count=Count('pattern')).order_by('-count')
+			countlist = list(countlist)
 
-		if not needSort:
-			patternorder = [patternset.filter(id=x)[0] for x in countlist]
-			return render_to_response("newsfeed.html", {'patternset':patternorder}, RequestContext(request))
+			if 'sort' in request.GET and request.GET['sort'] == 'relevancy':
+				values['relevancy'] = 'checked'
+				if len(patternset) == 0:
+					return render_to_response("newsfeed.html", values, RequestContext(request))
+				patternorder = [patternset.filter(id=x)[0] for x in countlist if len(patternset.filter(id=x)) == 1]
+				values['patternset'] = patternorder
+				return render_to_response("newsfeed.html", values, RequestContext(request))
+			else:
+				patternset = patternset.filter(id__in=countlist)
 
 
 	if 'sort' in request.GET:
 		sort = request.GET['sort']
 		if sort == 'likes':
 			patternset = patternset.order_by('-likes')
-		else:
+			values['likes'] = 'checked'
+		elif sort == 'published':
 			patternset = patternset.order_by('-date_published')
+			values['datepub'] = 'checked'
+		else:
+			values['relevancy'] = 'checked'
+	else:
+		values['datepub'] = 'checked'
 
 	patternset = patternset.order_by('-date_published')
 	

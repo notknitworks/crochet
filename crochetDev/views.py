@@ -18,15 +18,10 @@ from members.views import shownewsfeed
 
 from django.views.decorators.cache import cache_control
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def func():
-  #some code
-  return
-
 def homePage(request):
 	#if request.user.is_authenticated:
-	return shownewsfeed(request)
-	#return render_to_response("homepage.html", {}, RequestContext(request))
+	#return shownewsfeed(request)
+	return render_to_response("homepage.html", {}, RequestContext(request))
 
 def createUser(request):
 	if request.method == 'POST':
@@ -107,14 +102,5 @@ def loginuser(request):
 		user = request.user
 		request.session['patterns'] = Patterns.objects.filter(user=user.username)
 		request.session['users'] = User.objects.all().exclude(username=user.username)
-		#return render_to_response("userpage.html", {}, RequestContext(request))
 				
 		return HttpResponseRedirect("/"+ username)
-
-def savepattern(request):
-	username = request.user.username
-	patternName = request.POST['name']
-	pattern = Patterns(user=username, name=patternName, pattern='some pattern')
-	pattern.save()
-	request.session['patterns'] = Patterns.objects.filter(user=username)
-	return render_to_response("userpage.html", {}, RequestContext(request))

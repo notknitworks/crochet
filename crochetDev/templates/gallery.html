@@ -77,11 +77,11 @@
 
 <body>
 
-{% if request.user %}
+
 	<h1>Stitch-It</h1>
 	<h1>{{viewing.username}}'s Gallery</h1>
 
-		{% if viewing != request.user %}
+		{% if viewing != request.user and user.is_authenticated %}
 		<span id="follow_instructions"></span>
         <button type="button" id="follow" username="{{viewing.username}}" status="{{following}}"></button>
         {% endif %}
@@ -91,7 +91,7 @@
 			<div class="patternimage" style="height:200px; width:200px; background-color:#FFB968;">
 			</div>
 			<div class="patterninfo">
-				<div class="patternname">{{pattern.name}} </div>
+				<div class="patternname"><a href="/{{pattern.user.username}}/{{pattern.name}}/">{{pattern.name}}</a> </div>
 				<div class="patterncreated">{{pattern.date_published|date}}</div>
 				<div class="patterntagset">
 					{% for tag in pattern.tag_set.all %}
@@ -99,7 +99,7 @@
 					{% endfor %}
 				</div>
 				
-				{% if viewing != request.user %}
+				{% if viewing != request.user and user.is_authenticated %}
 					{% if pattern in request.user.saved_patterns.all%}
 					<button type="button" class="save" username="{{viewing.username}}" patternname="{{pattern.name}}" saved="True" disabled>
 						Already saved </button>
@@ -156,9 +156,5 @@
 		</div>
 
 		{% endfor %}
-
-
-
-{% endif %}
 </body>
 </html>

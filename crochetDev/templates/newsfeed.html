@@ -1,6 +1,6 @@
 <html>
 <head>
-	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}base.css">
+	<!--<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}base.css">-->
 </head>
 
 <body>
@@ -8,13 +8,30 @@
 	<form action="/accounts/logout/" method="get">
             <input type="submit" value="Logout"\>
      </form>
-
+{% endif %}
 
 	<h1>Newsfeed</h1>
+
+	<form action="/newsfeed/" method="get">
+		{% if request.user.is_authenticated %}
+		<input type="radio" name="filter_people" value="following" {{following}}>People I'm Following<br/>
+		<input type="radio" name="filter_people" value="all" {{allpeople}}>Everybody<br/><br/>
+		{% endif %}
+		<input type="radio" name="filter_interval" value="hour" {{hours}}>In the last hour<br/>
+		<input type="radio" name="filter_interval" value="day" {{days}}>In the last day<br/>
+		<input type="radio" name="filter_interval" value="all" {{alltime}}>All time<br/><br/>
+		<input type="radio" name="sort" value="likes" {{likes}}>Order by likes<br/>
+		<input type="radio" name="sort" value="published" {{datepub}}>Order by date published<br/>
+		<input type="radio" name="sort" value="relevancy" {{relevancy}}>Order by search relevancy<br/><br/>
+		<input type="search" name="search" value="{{words}}">
+		<input type="submit" value="Go">
+
+	</form>
+
 	{% if patternset %}
 		{% for pattern in patternset%}
 		<div class="patternbox">
-			<div class="patternimage" style="height:400px; width:400px; background-color:#FFB968;">
+			<div class="patternimage" style="height:200px; width:200px; background-color:#FFB968;">
 			</div>
 			<div class="patterninfo">
 				<div class="patternname">
@@ -27,47 +44,11 @@
 					<span class="patterntag">{{tag.content}}</span>
 					{% endfor %}
 				</div>
-				<div class="patternlikes">{{pattern.likes}} likes</div>
+				<!--<div class="patternlikes">{{pattern.likes}} likes</div>-->
 			</div>
 		</div>
 		{% endfor %}
 	{% endif %}
 
-{% else %}
-<h1>Welcome to stitch-it!</h1>
-	
-{% if user.is_authenticated %}
-	<p>You are currently logged in as {{ user.username }}.</p>
-	<a href="/account/{{ user.username }}">Go to my page.</a>
-	<form action="/accounts/logout/" method="get">
-      <input type="submit" value="Logout"\>
-    </form>
-{% else %}
-	<form action="/accounts/login/" method="post"> {% csrf_token %}
-		<div id="left">
-			<input type="text" name="username" id="username" placeholder="username">
-			<input type="password" name="password" placeholder="password">
-		</div>
-		<div id="right">
-			<input type="hidden" name="next" value="{{next}}" />
-			<input type="submit" value="Login">
-		</div>
-	</form>
-	<div id="create"> new? create an account </div>
-{% endif %}
-	
-	
-		<form action="/create/" method="post"> {% csrf_token %}
-			<h4>Create an account</h4>
-			<input type="text" name="first_name" placeholder="first name">
-			<input type="text" name="last_name" placeholder="last name">
-			<input type="text" name="email" placeholder="email">
-			<input type="text" name="username" id="username" placeholder="username">
-			<span id="available">{{ available }} </span>
-			<input type="password" name="password" placeholder="password">
-			<input type="submit" value="Create Account">
-		</form>
-
-{% endif %}
 </body>
 </html>

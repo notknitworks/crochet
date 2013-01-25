@@ -1,7 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.auth.views import login, logout
-from crochetDev.views import homePage, hello, createUser, user, loginuser, changepw, savepattern, viewuser
-#from crochetDev.members.views import *
+from crochetDev.views import homePage, hello, createUser, user, loginuser, changepw, viewuser
 from crochetDev.members.views import showgallery, showinterface, shownewsfeed, showmessagebox, followuser, savepattern, removepattern
 
 # Uncomment the next two lines to enable the admin:
