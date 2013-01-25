@@ -52,30 +52,32 @@ $(document).ready(function(){
 
 
 	//example format for saving patterns
-	// var testData = {
-	// 	0:{
-	// 		0:["HDC"],
-	// 		1:["HDC"],
-	// 		2:["HDC"],
-	// 		3:["HDC"],
-	// 	},
-	// 	1: {
-	// 		0:["HDC", "HDC"],
-	// 		1:[],
-	// 		2:["HDC"],
-	// 		3:["HDC"]
-	// 	},
-	// 	2: {
-	// 		0:["HDC", "HDC"],
-	// 	}
-	// };
+	var testData = {
+		0:{
+			0:["HDC"],
+			1:["HDC"],
+			2:["HDC"],
+			3:["HDC"],
+		},
+		1: {
+			0:["HDC", "HDC"],
+			1:[],
+			2:["HDC"],
+			3:["HDC"]
+		},
+		2: {
+			0:["HDC", "HDC"],
+		}
+	};
+	$("#interface").data("pattern", testData);
+	parsePattern(testData);
 
-	$(".pattern").load(function() {
-			console.log("HI");
-			$("#interface").data("pattern", $(this).attr("pattern"));
-			console.log($("#interface").data("pattern"));
-	parsePattern($.parseJSON($("#interface").data("pattern")));
-	});
+	// $(".pattern").load(function() {
+	// 		console.log("HI");
+	// 		$("#interface").data("pattern", $(this).attr("pattern"));
+	// 		console.log($("#interface").data("pattern"));
+	// parsePattern($.parseJSON($("#interface").data("pattern")));
+	// });
 });
 
 
@@ -229,7 +231,7 @@ function parseInput(text){
 
 	var matching = text.match(chainPattern);
 	if(matching != null){
-		var numChain = "";
+		var numChain = 1;
 		if(matching[1] != undefined){
 			numChain = parseInt(matching[1], 10);
 		}
@@ -246,22 +248,42 @@ function parseInput(text){
 
 	matching = text.match(stitchPattern);
 	if(matching != null){
+		//if start of pattern, add first row
+		if (!(0 in rows)) {
+			addRow();
+			$("#interface").data("pattern", {
+				0: {
+					0: new Array()
+				}
+			});
+		}
 		//name of the stitch
 		var stitch = matching[1];
 		var location = ""
 
-		if(matching[2] != undefined){
-			location = matching[2];
-			this.html = stitch.trim() + " " + location.trim();
-			this.valid = "right";
-			return;
+		var rowData = $("#interface").data("pattern")[curX];
+		if (matching[2] != null) {
+			if (matching[2].trim() == "in same stitch") {
+				removeCluster();
+				rowData[curCluster].push(stitch.toUpperCase());
+				delete rowData[curCluster+1];
+			} else {
+				rowData[curCluster] = [stitch.toUpperCase()];
+			}
+		} else {
+			rowData[curCluster] = [stitch.toUpperCase()];
 		}
-		//TODO make the Stitch object with numChain
-		addStitch(new Stitch(stitch.toUpperCase()));
-		$("#interface").data("pattern")[curX][curCluster].push(stitch.toUpperCase());
-		//return getHTMLBox(stitch, true);
 
-		this.html = stitch;
+		addStitch(new Stitch(stitch.toUpperCase()));
+		addCluster();
+
+		this.html = matching.slice(1).filter(function(x) {
+			return x != null;
+		}).reduce(function(x, y) {
+			return x.trim() + " "+y.trim();
+		});
+
+		//this.html = stitch;
 		this.valid = "right";
 		return;
 	}
@@ -270,7 +292,7 @@ function parseInput(text){
 	if(matching != null){
 		var numSkip = "";
 		if(matching[1] != undefined){
-			numSkip = parseInt(matching[1], 10);
+			numSkip = parseInt(matching[1]);
 		}
 		//return getHTMLBox("sk " + numSkip, true);
 		skipStitch();
