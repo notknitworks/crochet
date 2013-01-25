@@ -83,7 +83,7 @@ def shownewsfeed(request):
 	else:
 		values['alltime'] = 'checked'
 		
-
+	#when RELEVANCY is chosen by
 	if 'search' in request.GET:
 		words = request.GET['search']
 		if words != "":
@@ -92,18 +92,27 @@ def shownewsfeed(request):
 			values['words'] = words
 
 			tagset = Tag.objects.filter(content__in=wordset)
-			countlist = tagset.values_list('pattern', flat=True).annotate(count=Count('pattern')).order_by('-count')
+
+			countlist = None
+
+			if 'sort' in request.GET:
+				if request.GET['sort'] == 'likes':
+					values['likes'] = 'checked'
+					countlist = tagset.values_list('pattern', flat=True).annotate(count=Count('pattern')).order_by('-count', '-pattern__likes')
+				else:
+					values['datepub'] = 'checked'
+					countlist = tagset.values_list('pattern', flat=True).annotate(count=Count('pattern')).order_by('-count', '-pattern')
+			else:
+				values['datepub'] = 'checked'
+				countlist = tagset.values_list('pattern', flat=True).annotate(count=Count('pattern')).order_by('-count', '-pattern')
 			countlist = list(countlist)
 
-			if 'sort' in request.GET and request.GET['sort'] == 'relevancy':
-				values['relevancy'] = 'checked'
-				if len(patternset) == 0:
-					return render_to_response("newsfeed.html", values, RequestContext(request))
-				patternorder = [patternset.filter(id=x)[0] for x in countlist if len(patternset.filter(id=x)) == 1]
-				values['patternset'] = patternorder
+			
+			if len(patternset) == 0:
 				return render_to_response("newsfeed.html", values, RequestContext(request))
-			else:
-				patternset = patternset.filter(id__in=countlist)
+			patternorder = [patternset.filter(id=x)[0] for x in countlist if len(patternset.filter(id=x)) == 1]
+			values['patternset'] = patternorder
+			return render_to_response("newsfeed.html", values, RequestContext(request))
 
 
 	if 'sort' in request.GET:
