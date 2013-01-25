@@ -1,45 +1,164 @@
 <html>
 <head>
+	<script src="http://code.jquery.com/jquery.min.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		$("document").ready(function(){
+			showfollow();
+			$("#follow").click(function(){
+				followclick($(this));
+			});
+
+			$(".save").click(function(){
+				savepattern($(this));
+			});
+
+			$(".remove").click(function(){
+				removepattern($(this));
+			});
+		});
+
+		function followclick(button){
+			if(button.attr("status") == "True"){
+				$.getJSON("/follow/", {'action':'unfollow', 'person': button.attr("username")},
+				
+				function(data){
+					$("#follow").attr("status", "False");
+					showfollow();
+				});
+
+			} else {
+				$.getJSON("/follow/", {'action':'follow', 'person' :  button.attr("username")},
+				
+				function(data){
+					$("#follow").attr("status", "True");
+					showfollow();
+				});
+			}	
+		};
+
+		function showfollow(){
+			follow = $("#follow").attr("status")
+			if (follow == "True") {
+				$("#follow_instructions").html("You are following " + $("#follow").attr("username"));
+				$("#follow").html("Unfollow");
+			} else {
+				$("#follow_instructions").html("You are not following " + $("#follow").attr("username"));
+				$("#follow").html("Follow");
+			}
+		}
+
+		function savepattern(button){
+			username = button.attr("username")
+			patternname = button.attr("patternname")
+		
+			$.getJSON("/savepattern/", {'person':username, 'pattern':patternname},
+			
+			function(data){
+				button.attr("disabled", "");
+				button.html("Already saved");
+			});
+		};
+
+		function removepattern(button){
+			username = button.attr("username");
+			patternname = button.attr("patternname");
+			console.log("person is "+ username);
+			console.log("pattern is "+ patternname);
+		
+			$.getJSON("/removepattern/", {'person':username, 'pattern':patternname},
+			
+			function(data){
+				button.parent().parent().remove();
+			});	
+		}
+
+	</script>
 </head>
 
 <body>
-	{% if request.user %}
 
+{% if request.user %}
+	<h1>Stitch-It</h1>
 	<h1>{{viewing.username}}'s Gallery</h1>
 
-	<ul>
-		{% for name in request.session.pattern_names %}
+		{% if viewing != request.user %}
+		<span id="follow_instructions"></span>
+        <button type="button" id="follow" username="{{viewing.username}}" status="{{following}}"></button>
+        {% endif %}
 
-			<li> {{ name }} </li>
+		{% for pattern in published %}
+		<div class="patternbox">
+			<div class="patternimage" style="height:200px; width:200px; background-color:#FFB968;">
+			</div>
+			<div class="patterninfo">
+				<div class="patternname">{{pattern.name}} </div>
+				<div class="patterncreated">{{pattern.date_published|date}}</div>
+				<div class="patterntagset">
+					{% for tag in pattern.tag_set.all %}
+					<span class="patterntag">{{tag.content}}</span>
+					{% endfor %}
+				</div>
+				
+				{% if viewing != request.user %}
+					{% if pattern in request.user.saved_patterns.all%}
+					<button type="button" class="save" username="{{viewing.username}}" patternname="{{pattern.name}}" saved="True" disabled>
+						Already saved </button>
+					{% else %}
+					<button type="button" class="save" username="{{viewing.username}}" patternname="{{pattern.name}}" saved="False"> Save </button>
+					{% endif %}
+				{% endif %}
+			</div>
+		</div>
 
 		{% endfor %}
-	</ul>
 
 	{% if unpublished %}
 		<h2> Unpublished patterns (only visible to you) </h2>
-		<ul>
 			{% for pattern in unpublished %}
-
-				<li> {{ pattern.name }} </li>
-
-			{% endfor %}
-		</ul>
-	{% endif %}
-
-	{% if messages %}
-		<h2> Your Messages </h2>
-		<ul>
-			{% for message in messages %}
-
-				<li> <b> {{message.sender.username}} </b> to  <b> {{message.receiver.username}} </b>on {{message.date_sent|date}}:
-					{{ message.content }} 
-				</li>
+			<div class="patternbox">
+				<div class="patternimage" style="height:200; width:200px; background-color:#FFB968;"></div>
+				<div class="patterninfo">
+					<div class="patterncreated">Created {{pattern.date_created|date}}</div>
+					<div class="patterntagset">
+						{% for tag in pattern.tag_set.all %}
+						<span class="patterntag">{{tag.content}}</span>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
 
 			{% endfor %}
-		</ul>
-
 	{% endif %}
 
-	{% endif %}
+	<h1>Saved patterns</h1>
+	{% for pattern in saved %}
+		<div class="patternbox">
+			<div class="patternimage" style="height:200px; width:200px; background-color:#FFB968;">
+			</div>
+			<div class="patterninfo">
+				<div class="patternname">
+					<a href="/{{pattern.user.username}}/{{pattern.name}}/">{{pattern.name}}</a> by 
+					<a href="/{{pattern.user.username}}/">{{pattern.user.username}}</a>
+				</div>
+				<div class="patterncreated">{{pattern.date_published|date}}</div>
+				<div class="patterntagset">
+					{% for tag in pattern.tag_set.all %}
+					<span class="patterntag">{{tag.content}}</span>
+					{% endfor %}
+				</div>
+				
+				{% if viewing == request.user %}
+					<button type="button" class="remove" username="{{pattern.user.username}}" patternname="{{pattern.name}}">
+						Remove </button>
+				{% endif %}
+
+			</div>
+		</div>
+
+		{% endfor %}
+
+
+
+{% endif %}
 </body>
 </html>

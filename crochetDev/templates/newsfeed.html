@@ -1,13 +1,73 @@
 <html>
 <head>
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}base.css">
 </head>
 
 <body>
-	{% if request.user %}
+{% if request.user.is_authenticated %}
+	<form action="/accounts/logout/" method="get">
+            <input type="submit" value="Logout"\>
+     </form>
 
-	<h1>Newsfeed page for {{request.user.username}}</h1>
 
-
+	<h1>Newsfeed</h1>
+	{% if patternset %}
+		{% for pattern in patternset%}
+		<div class="patternbox">
+			<div class="patternimage" style="height:400px; width:400px; background-color:#FFB968;">
+			</div>
+			<div class="patterninfo">
+				<div class="patternname">
+					<a href="/{{pattern.user.username}}/{{pattern.name}}/">{{pattern.name}}</a> by 
+					<a href="/{{pattern.user.username}}/">{{pattern.user.username}}</a>
+				</div>
+				<div class="patterncreated">{{pattern.date_published|date}}</div>
+				<div class="patterntagset">
+					{% for tag in pattern.tag_set.all %}
+					<span class="patterntag">{{tag.content}}</span>
+					{% endfor %}
+				</div>
+				<div class="patternlikes">{{pattern.likes}} likes</div>
+			</div>
+		</div>
+		{% endfor %}
 	{% endif %}
+
+{% else %}
+<h1>Welcome to stitch-it!</h1>
+	
+{% if user.is_authenticated %}
+	<p>You are currently logged in as {{ user.username }}.</p>
+	<a href="/account/{{ user.username }}">Go to my page.</a>
+	<form action="/accounts/logout/" method="get">
+      <input type="submit" value="Logout"\>
+    </form>
+{% else %}
+	<form action="/accounts/login/" method="post"> {% csrf_token %}
+		<div id="left">
+			<input type="text" name="username" id="username" placeholder="username">
+			<input type="password" name="password" placeholder="password">
+		</div>
+		<div id="right">
+			<input type="hidden" name="next" value="{{next}}" />
+			<input type="submit" value="Login">
+		</div>
+	</form>
+	<div id="create"> new? create an account </div>
+{% endif %}
+	
+	
+		<form action="/create/" method="post"> {% csrf_token %}
+			<h4>Create an account</h4>
+			<input type="text" name="first_name" placeholder="first name">
+			<input type="text" name="last_name" placeholder="last name">
+			<input type="text" name="email" placeholder="email">
+			<input type="text" name="username" id="username" placeholder="username">
+			<span id="available">{{ available }} </span>
+			<input type="password" name="password" placeholder="password">
+			<input type="submit" value="Create Account">
+		</form>
+
+{% endif %}
 </body>
 </html>

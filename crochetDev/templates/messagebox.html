@@ -1,0 +1,55 @@
+<html>
+<head>
+</head>
+
+<body>
+{% if request.user %}
+
+{% if conversation %}
+	
+	<h3>{{partner.username}}</h3>
+	<a href="/inbox/">Back to main page</a>
+	{% for message in conversation %}
+
+		<li> <b> {{message.sender.username}} </b> 
+			on {{message.date_sent|date}}:{{ message.content }} 
+		</li>
+
+	{% endfor %}
+
+	<p>Reply</p>
+	<form action="/inbox/" method="post"> {% csrf_token %}
+			<textarea name="content" rows="5" value=""></textarea>
+            <input type="submit" value="Send"\>
+            <input type="hidden" name="touser" value="{{partner.username}}" />
+    </form>
+
+{% else %}
+
+		{% if request.session.user_messages %}
+
+			<ul>
+			{% for name in request.session.user_messages %}
+			<li> 
+				<a href="/inbox/?username={{name}}">{{ name }}</a>
+			</li>
+			{% endfor %}
+			</ul>
+
+		{% endif %}
+{% endif %}
+
+<p>Compose</p>
+	<form action="/inbox/" method="post"> {% csrf_token %}
+			To: <input type="text" name="touser" value="" placeholder="username"/>
+			<br/>
+			<textarea name="content" rows="5"></textarea>
+            <input type="submit" value="Send"\>
+            
+    </form>
+{% endif %}
+
+
+</body>
+
+</html>

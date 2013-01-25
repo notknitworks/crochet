@@ -14,9 +14,19 @@ from django.contrib.sessions.models import Session
 from django.utils import simplejson
 import json
 from django.shortcuts import redirect
+from members.views import shownewsfeed
+
+from django.views.decorators.cache import cache_control
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def func():
+  #some code
+  return
 
 def homePage(request):
-	return render_to_response("homepage.html", {}, RequestContext(request))
+	#if request.user.is_authenticated:
+	return shownewsfeed(request)
+	#return render_to_response("homepage.html", {}, RequestContext(request))
 
 def createUser(request):
 	if request.method == 'POST':
@@ -87,18 +97,19 @@ def loginuser(request):
 				#request.session['users'] = User.objects.all().exclude(username=username)
 				#choosing random 10 people for now	
 				
-				return redirect("/account/" + username)
+				return HttpResponseRedirect("/"+ username)
 			else:
 				#user's account has been deactivated
-				return render_to_response("homepage.html", {}, RequestContext(request))
+				return render_to_response("newsfeed.html", {}, RequestContext(request))
 		else:
-			return render_to_response("userpage.html", {}, RequestContext(request))
+			return render_to_response("newsfeed.html", {}, RequestContext(request))
 	else:
 		user = request.user
 		request.session['patterns'] = Patterns.objects.filter(user=user.username)
 		request.session['users'] = User.objects.all().exclude(username=user.username)
 		#return render_to_response("userpage.html", {}, RequestContext(request))
-		return redirect("/account/" + username)
+				
+		return HttpResponseRedirect("/"+ username)
 
 def savepattern(request):
 	username = request.user.username

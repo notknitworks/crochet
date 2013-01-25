@@ -2,7 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib.auth.views import login, logout
 from crochetDev.views import homePage, hello, createUser, user, loginuser, changepw, savepattern, viewuser
 #from crochetDev.members.views import *
-from crochetDev.members.views import showgallery, showinterface, shownewsfeed
+from crochetDev.members.views import showgallery, showinterface, shownewsfeed, showmessagebox, followuser, savepattern, removepattern
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -18,15 +18,31 @@ urlpatterns = patterns('',
     (r'^accounts/logout/$', logout, {'next_page': '/'}),
     (r'^userpage/$', user),
     (r'^changepw/$', changepw),
-    (r'^savepattern/$', savepattern),
     #(r'^(?P<path>.*)$', 'django.views.static.serve',
     #    {'document_root': '/home/neha/crochetProj/crochetDev/static/'}),
     (r'^accounts/login/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': '/home/neha/crochetProj/crochetDev/static/'}),
     (r'^account/(?P<name>\w+)$', viewuser),
-    (r'^gallery/(?P<name>\w+)$', showgallery),
-    (r'^interface/(?P<name>\w+)/(?P<patternname>\w+)$', showinterface),
+    (r'^savepattern/$', savepattern),
+    (r'^removepattern/$', removepattern),
+    (r'^follow/$', followuser),
     (r'^newsfeed/$', shownewsfeed),
+    (r'^inbox/$', showmessagebox),
+    (r'^(?P<name>\w+)/$', showgallery),
+    (r'^(?P<name>\w+)/(?P<patternname>.+)/$', showinterface),
+
+
+
+
+
+
+
+
+
+
+
+
+
     # url(r'^crochetDev/', include('crochetDev.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
