@@ -88,9 +88,8 @@ def loginuser(request):
 			if user.is_active:
 				login(request)
 				patterns = Patterns.objects.filter(user=username)
-				request.session['patterns'] = Patterns.objects.filter(user=username)
-				#request.session['users'] = User.objects.all().exclude(username=username)
-				#choosing random 10 people for now	
+				#request.session['patterns'] = Patterns.objects.filter(user=username)
+				request.session['inbox_unread'] = user.received.filter(read=False).count()
 				
 				return HttpResponseRedirect("/"+ username)
 			else:

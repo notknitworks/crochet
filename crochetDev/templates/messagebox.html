@@ -26,12 +26,12 @@
 
 {% else %}
 
-		{% if request.session.user_messages %}
+		{% if request.session.unread_values %}
 
 			<ul>
-			{% for name in request.session.user_messages %}
+			{% for pair in request.session.unread_values %}
 			<li> 
-				<a href="/inbox/?username={{name}}">{{ name }}</a>
+				<a href="/inbox/?username={{pair.0}}">{{ pair.0 }} {{pair.1}}</a>
 			</li>
 			{% endfor %}
 			</ul>

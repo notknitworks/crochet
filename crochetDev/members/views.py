@@ -188,14 +188,33 @@ def showmessagebox(request):
 		if message not in interactions:
 			interactions.append(message)
 
+	unreadcount = []
+	unreadvalues = []
+	for sender in interactions:
+		unreadcount.append(messages.filter(receiver=user, sender=sender, read=False).count())
+		unreadvalues.append((sender,messages.filter(receiver=user, sender=sender, read=False).count()))
+
 	request.session['user_messages'] = interactions
+	request.session['unread_count'] = unreadcount
+	request.session['unread_values'] = unreadvalues
 	return render_to_response("messagebox.html", {}, RequestContext(request))
 
 def getmessagesfrom(request, username):
 	user = request.user
 	values = {}
 	partner = User.objects.filter(username=username)[0]
-	values['conversation'] = (user.received.filter(sender=partner) | user.sent.filter(receiver=partner)).order_by('date_sent')
+	receivedmessages = user.received.filter(sender=partner)
+	
+	read = 0
+	for convo in receivedmessages:
+		if convo.read == False:
+			read += 1
+			convo.read = True
+			convo.save()
+			
+	request.session['inbox_unread'] = user.received.filter(read=False).count()
+
+	values['conversation'] = (receivedmessages | user.sent.filter(receiver=partner)).order_by('date_sent')
 	values['partner'] = partner
 	return render_to_response("messagebox.html",values, RequestContext(request))
 
@@ -208,6 +227,9 @@ def followuser(request):
 	if action == 'follow':
 		connection = Connection(followed=followed, follower=request.user)
 		connection.save()
+		#messages.add_message(request, messages.INFO, 'Hello world.')
+		#followed.message_set.create(message="<a href='/{{request.user.username}}'>" + request.user.username 
+		#	+ "</a> started following you.")
 	else:
 		find = Connection.objects.filter(followed=followed, follower=request.user)
 		for connection in find:

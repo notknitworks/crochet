@@ -80,6 +80,16 @@
 
 	<h1>Stitch-It</h1>
 	<h1>{{viewing.username}}'s Gallery</h1>
+		{% if request.user.is_authenticated %}
+			<form action="/accounts/logout/" method="get">
+		            <input type="submit" value="Logout"\>
+		    </form>
+		    <a href="/{{request.user.username}}/">My Gallery</a>
+		    <a href="/{{request.user.username}}/untitled/">Create new pattern</a>
+		    <a href="/newsfeed/">Browse Projects</a>
+		    <a href="/inbox/">Inbox ({{request.session.inbox_unread}})</a>
+
+		{% endif %}
 
 		{% if viewing != request.user and user.is_authenticated %}
 		<span id="follow_instructions"></span>

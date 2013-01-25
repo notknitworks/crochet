@@ -7,8 +7,18 @@
 {% if request.user.is_authenticated %}
 	<form action="/accounts/logout/" method="get">
             <input type="submit" value="Logout"\>
-     </form>
-{% endif %}
+    </form>
+    <a href="/{{request.user.username}}/">My Gallery</a>
+    <a href="/{{request.user.username}}/untitled/">Create new pattern</a>
+    <a href="/newsfeed/">Browse Projects</a>
+    {% if messages %}
+			<ul>
+			    {% for message in messages %}
+			    <li>{{ message }}</li>
+			    {% endfor %}
+			</ul>
+			{% endif %}
+	{% endif %}
 
 	<h1>Newsfeed</h1>
 
@@ -20,8 +30,9 @@
 		<input type="radio" name="filter_interval" value="hour" {{hours}}>In the last hour<br/>
 		<input type="radio" name="filter_interval" value="day" {{days}}>In the last day<br/>
 		<input type="radio" name="filter_interval" value="all" {{alltime}}>All time<br/><br/>
-		<input type="radio" name="sort" value="likes" {{likes}}>Order by likes<br/>
-		<input type="radio" name="sort" value="published" {{datepub}}>Order by date published<br/>
+		Priority:
+		<input type="radio" name="sort" value="likes" {{likes}}>Likes<br/>
+		<input type="radio" name="sort" value="published" {{datepub}}>Date published<br/>
 		<input type="search" name="search" value="{{words}}">
 		<input type="submit" value="Go">
 
@@ -30,7 +41,7 @@
 	{% if patternset %}
 		{% for pattern in patternset%}
 		<div class="patternbox">
-			<div class="patternimage" style="height:200px; width:200px; background-color:#FFB968;">
+			<div class="patternimage" instructions="{{pattern.instructions}}" style="height:200px; width:200px; background-color:#FFB968;">
 			</div>
 			<div class="patterninfo">
 				<div class="patternname">
