@@ -3,12 +3,24 @@
 	<!--<script src="account.js"></script>-->
 	<!-- for testing purposes
 	<ling rel="stylesheet" type="text/css" href="base.css" -->
-	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}base.css">
+	<!--<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}base.css">-->
+	<style>
+		input
+		{
+			display: block;
+			padding: 5px;
+			margin: 5px;
+			height: 30px;
+			width: 200px;
+			border-radius: 5px;
+		}
+
+	</style>
 </head>
 
 <body>
 	<h1>Welcome to stitch-it!</h1>
-	<a href="/newsfeed/">Browse Projects</a>
+	
 	
 {% if user.is_authenticated %}
 	<p>You are currently logged in as {{ user.username }}.</p>
@@ -17,21 +29,24 @@
       <input type="submit" value="Logout"\>
     </form>
 {% else %}
-	<form action="/accounts/login/" method="post"> {% csrf_token %}
+	<form action="/accounts/login/" method="post" id="login"> {% csrf_token %}
 		<div id="left">
 			<input type="text" name="username" id="username" placeholder="username">
 			<input type="password" name="password" placeholder="password">
 		</div>
 		<div id="right">
 			<input type="hidden" name="next" value="{{next}}" />
-			<input type="submit" value="Login">
+			<input type="submit" value="Go">
 		</div>
 	</form>
-	<div id="create"> new? create an account </div>
+	<p>new? </p>
+	<span id="create"> create an account </span> 
+	<span>or</span>
+	<a href="/newsfeed/">Browse Projects</a><br/>
 {% endif %}
 	
 	
-		<form action="/create/" method="post"> {% csrf_token %}
+		<form action="/create/" method="post" id="createnew"> {% csrf_token %}
 			<h4>Create an account</h4>
 			<input type="text" name="first_name" placeholder="first name">
 			<input type="text" name="last_name" placeholder="last name">

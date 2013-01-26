@@ -30,8 +30,8 @@
 		<input type="radio" name="filter_interval" value="hour" {{hours}}>In the last hour<br/>
 		<input type="radio" name="filter_interval" value="day" {{days}}>In the last day<br/>
 		<input type="radio" name="filter_interval" value="all" {{alltime}}>All time<br/><br/>
-		Priority:
-		<input type="radio" name="sort" value="likes" {{likes}}>Likes<br/>
+		Priority:<br/>
+		<input type="radio" name="sort" value="likes" {{likes}}>Savers<br/>
 		<input type="radio" name="sort" value="published" {{datepub}}>Date published<br/>
 		<input type="search" name="search" value="{{words}}">
 		<input type="submit" value="Go">
@@ -45,10 +45,11 @@
 			</div>
 			<div class="patterninfo">
 				<div class="patternname">
-					<a href="/{{pattern.user.username}}/{{pattern.name}}/">{{pattern.name}}</a> by 
+					<a href="/{{pattern.user.username}}/{{pattern.id}}/">{{pattern.name}}</a> by 
 					<a href="/{{pattern.user.username}}/">{{pattern.user.username}}</a>
 				</div>
 				<div class="patterncreated">{{pattern.date_published|date}}</div>
+				<div class="patternlikes">{{pattern.likes}} saver{{pattern.likes|pluralize}}</div>
 				<div class="patterntagset">
 					{% for tag in pattern.tag_set.all %}
 					<span class="patterntag">{{tag.content}}</span>

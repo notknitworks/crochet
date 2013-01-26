@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.auth.views import login, logout
 from crochetDev.views import homePage, hello, createUser, user, loginuser, changepw, viewuser
-from crochetDev.members.views import showgallery, showinterface, shownewsfeed, showmessagebox, followuser, savepattern, removepattern
+from crochetDev.members.views import *
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -27,8 +27,11 @@ urlpatterns = patterns('',
     (r'^follow/$', followuser),
     (r'^newsfeed/$', shownewsfeed),
     (r'^inbox/$', showmessagebox),
+    (r'^deletepattern/$', deletepattern),
+    (r'^publishpattern/$', publishpattern),
     (r'^(?P<name>\w+)/$', showgallery),
-    (r'^(?P<name>\w+)/(?P<patternname>.+)/$', showinterface),
+    (r'^(?P<name>\w+)/untitled/$', createnew),
+    (r'^(?P<name>\w+)/(?P<patternid>\d+)/$', showinterface),
 
 
 

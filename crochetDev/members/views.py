@@ -127,39 +127,58 @@ def shownewsfeed(request):
 			values['relevancy'] = 'checked'
 	else:
 		values['datepub'] = 'checked'
-
-	patternset = patternset.order_by('-date_published')
+		patternset = patternset.order_by('-date_published')
 	
 
 	values['patternset'] = patternset
 	return render_to_response("newsfeed.html", values, RequestContext(request))
 
-def showinterface(request, name, patternname):
+def showinterface(request, name, patternid):
 
-	creator = User.objects.filter(username=name)
+	creator = User.objects.filter(username=name)[0]
+	values = {}
 
 	if creator != request.user:
-		pattern = Pattern.objects.filter(user=creator, name=patternname, date_published__isnull=False)
+		#viewing someone else's pattern
+		pattern = Pattern.objects.filter(user=creator, id=patternid, date_published__isnull=False)
 		if len(pattern) == 0:
-			return HttpResponse("wrong")
+			return render_to_response("interface.html", values, RequestContext(request))
 			# return some sort of error
 		pattern = pattern[0]
+		values['pattern'] = pattern
 	else:
-		pattern = request.user.created_patterns.filter(name=pattern)
+		#user's own pattern (may be unpublished)
+		pattern = request.user.created_patterns.filter(id=patternid)
 		if len(pattern) == 0:
 			return HttpResponse("wrong")
 			# return some sort of error
 		pattern = pattern[0]
-		messages = pattern.message_set.order_by('date_sent')
-
-	request.session['instructions'] = pattern.instructions
-	request.session['likes'] = pattern.likes
-	request.session['savers'] = [saver.username for saver in pattern.savers.all()]
-	request.session['tags'] = pattern.tag_set.all()
+		values['pattern'] = pattern
 
 	#TODO return http response
 
-	return HttpResponse(patternname)
+	return render_to_response("interface.html", values, RequestContext(request))
+
+def createnew(request, name):
+	creators = User.objects.filter(username=name)
+	if creators.count() == 0:
+		return HttpResponse("anonymous user")
+	else:
+		creator = creators[0]
+		num = 1
+		success = False
+		p = None
+		while not success:
+			name = "untitled" + str(num) + ""
+			made = creator.created_patterns.all().filter(name=name)
+			boolean = made.count() == 0
+			if made.count() == 0:
+				p = Pattern(user=creator, name=name, instructions="")
+				p.save()
+				success = True
+			else:
+				num += 1
+		return HttpResponseRedirect("/"+ creator.username + "/" + str(p.id) + "/")
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def showmessagebox(request):
@@ -194,8 +213,6 @@ def showmessagebox(request):
 		unreadcount.append(messages.filter(receiver=user, sender=sender, read=False).count())
 		unreadvalues.append((sender,messages.filter(receiver=user, sender=sender, read=False).count()))
 
-	request.session['user_messages'] = interactions
-	request.session['unread_count'] = unreadcount
 	request.session['unread_values'] = unreadvalues
 	return render_to_response("messagebox.html", {}, RequestContext(request))
 
@@ -205,13 +222,11 @@ def getmessagesfrom(request, username):
 	partner = User.objects.filter(username=username)[0]
 	receivedmessages = user.received.filter(sender=partner)
 	
-	read = 0
 	for convo in receivedmessages:
 		if convo.read == False:
-			read += 1
 			convo.read = True
 			convo.save()
-			
+
 	request.session['inbox_unread'] = user.received.filter(read=False).count()
 
 	values['conversation'] = (receivedmessages | user.sent.filter(receiver=partner)).order_by('date_sent')
@@ -247,9 +262,10 @@ def savepattern(request):
 
 	patterns = galleryowner.created_patterns.filter(name=request.GET['pattern'])
 	pattern = patterns[0]
+	pattern.likes = pattern.likes + 1
+	pattern.save()
 
 	request.user.saved_patterns.add(pattern)
-	request.user.save()
 
 	return HttpResponse(json.dumps({}), content_type="application/json")
 
@@ -259,10 +275,29 @@ def removepattern(request):
 
 	patterns = creator.created_patterns.filter(name=request.GET['pattern'])
 	pattern = patterns[0]
+	pattern.likes = pattern.likes - 1
+	pattern.save()
 
 	request.user.saved_patterns.remove(pattern)
 	request.user.save()
 
+	return HttpResponse(json.dumps({}), content_type="application/json")
+
+def deletepattern(request):
+	patternid = request.GET['patternid']
+	pattern = Pattern.objects.filter(id=patternid)
+	if pattern.count() == 1:
+		pattern.delete()
+
+	return HttpResponse(json.dumps({}), content_type="application/json")
+
+def publishpattern(request):
+	patternid = request.GET['patternid']
+	patterns = Pattern.objects.filter(id=patternid)
+	if patterns.count() == 1:
+		pattern = patterns[0]
+		pattern.date_published = datetime.now()
+		pattern.save()
 	return HttpResponse(json.dumps({}), content_type="application/json")
 	
 

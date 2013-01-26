@@ -15,6 +15,10 @@
 			$(".remove").click(function(){
 				removepattern($(this));
 			});
+
+			$(".delpattern").click(function(){
+				deletepattern($(this));
+			});
 		});
 
 		function followclick(button){
@@ -72,6 +76,15 @@
 			});	
 		}
 
+		function deletepattern(button){
+			id = button.attr("patternid");
+
+			$.getJSON("/deletepattern/", {'patternid':id },
+				function(data){
+					button.parent().parent().remove();
+			});
+		};
+
 	</script>
 </head>
 
@@ -101,7 +114,7 @@
 			<div class="patternimage" style="height:200px; width:200px; background-color:#FFB968;">
 			</div>
 			<div class="patterninfo">
-				<div class="patternname"><a href="/{{pattern.user.username}}/{{pattern.name}}/">{{pattern.name}}</a> </div>
+				<div class="patternname"><a href="/{{pattern.user.username}}/{{pattern.id}}/">{{pattern.name}}</a> </div>
 				<div class="patterncreated">{{pattern.date_published|date}}</div>
 				<div class="patterntagset">
 					{% for tag in pattern.tag_set.all %}
@@ -117,6 +130,11 @@
 					<button type="button" class="save" username="{{viewing.username}}" patternname="{{pattern.name}}" saved="False"> Save </button>
 					{% endif %}
 				{% endif %}
+
+				{% if viewing == request.user %}
+					<button class="delpattern" patternid="{{pattern.id}}">Delete pattern</button>
+				{% endif %}
+
 			</div>
 		</div>
 
@@ -128,12 +146,14 @@
 			<div class="patternbox">
 				<div class="patternimage" style="height:200; width:200px; background-color:#FFB968;"></div>
 				<div class="patterninfo">
+					<div class="patternname"><a href="/{{pattern.user.username}}/{{pattern.id}}/">{{pattern.name}}</a> </div>
 					<div class="patterncreated">Created {{pattern.date_created|date}}</div>
 					<div class="patterntagset">
 						{% for tag in pattern.tag_set.all %}
 						<span class="patterntag">{{tag.content}}</span>
 						{% endfor %}
 					</div>
+					<button class="delpattern" patternid="{{pattern.id}}">Delete</button>
 				</div>
 			</div>
 
@@ -147,7 +167,7 @@
 			</div>
 			<div class="patterninfo">
 				<div class="patternname">
-					<a href="/{{pattern.user.username}}/{{pattern.name}}/">{{pattern.name}}</a> by 
+					<a href="/{{pattern.user.username}}/{{pattern.id}}/">{{pattern.name}}</a> by 
 					<a href="/{{pattern.user.username}}/">{{pattern.user.username}}</a>
 				</div>
 				<div class="patterncreated">{{pattern.date_published|date}}</div>
