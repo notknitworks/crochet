@@ -33,6 +33,11 @@ var STITCH_IMGS = {
         SRC:"",
         WIDTH:20,
         HEIGHT:40
+    },
+    DC:{
+        SRC:"",
+        WIDTH:20,
+        HEIGHT:60
     }
 };
 $(function() {
@@ -60,41 +65,42 @@ $(function() {
     addStitch(new Stitch("HDC"));
     addCluster();
     addStitch(new Stitch("HDC"));
-    addCluster();
+    // addCluster();
 
     addRow();
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-
-    skipStitch();
-    skipStitch();
-    addStitch(new Stitch("HDC"));
-
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    skipStitch();
-    // skipStitch();
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    addStitch(new Stitch("HDC"));
-    addRow();
-
-    addStitch(new Stitch("HDC"));
     // addStitch(new Stitch("HDC"));
-    addChain();
-    // addChain();
-    // addChain();
-    // addChain();
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
 
-    //WHY LOOPING HERE? addChain();
+    // skipStitch();
+    // skipStitch();
+    // addStitch(new Stitch("HDC"));
+
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    // skipStitch();
+    // // skipStitch();
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    // addRow();
+
+    // addStitch(new Stitch("HDC"));
+    // // addStitch(new Stitch("HDC"));
+    // addChain();
+    // // addChain();
+    // // addChain();
+    // // addChain();
+
+    // //WHY LOOPING HERE? addChain();
 
 
-    addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
 
 
 
 });
+
 
     function addStitch(stitch) {
         rows[curX]['stitches']++;
