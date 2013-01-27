@@ -40,6 +40,7 @@ class Message(models.Model):
     receiver = models.ForeignKey(User, related_name="received") #message.receiver or u1.received
     content = models.CharField(max_length=100)
     date_sent = models.DateTimeField()
+    read = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.date_sent == None:

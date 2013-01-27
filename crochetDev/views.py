@@ -14,8 +14,13 @@ from django.contrib.sessions.models import Session
 from django.utils import simplejson
 import json
 from django.shortcuts import redirect
+from members.views import shownewsfeed
+
+from django.views.decorators.cache import cache_control
 
 def homePage(request):
+	#if request.user.is_authenticated:
+	#return shownewsfeed(request)
 	return render_to_response("homepage.html", {}, RequestContext(request))
 
 def createUser(request):
@@ -83,27 +88,18 @@ def loginuser(request):
 			if user.is_active:
 				login(request)
 				patterns = Patterns.objects.filter(user=username)
-				request.session['patterns'] = Patterns.objects.filter(user=username)
-				#request.session['users'] = User.objects.all().exclude(username=username)
-				#choosing random 10 people for now	
+				#request.session['patterns'] = Patterns.objects.filter(user=username)
+				request.session['inbox_unread'] = user.received.filter(read=False).count()
 				
-				return redirect("/account/" + username)
+				return HttpResponseRedirect("/"+ username)
 			else:
 				#user's account has been deactivated
-				return render_to_response("homepage.html", {}, RequestContext(request))
+				return render_to_response("newsfeed.html", {}, RequestContext(request))
 		else:
-			return render_to_response("userpage.html", {}, RequestContext(request))
+			return render_to_response("newsfeed.html", {}, RequestContext(request))
 	else:
 		user = request.user
 		request.session['patterns'] = Patterns.objects.filter(user=user.username)
 		request.session['users'] = User.objects.all().exclude(username=user.username)
-		#return render_to_response("userpage.html", {}, RequestContext(request))
-		return redirect("/account/" + username)
-
-def savepattern(request):
-	username = request.user.username
-	patternName = request.POST['name']
-	pattern = Patterns(user=username, name=patternName, pattern='some pattern')
-	pattern.save()
-	request.session['patterns'] = Patterns.objects.filter(user=username)
-	return render_to_response("userpage.html", {}, RequestContext(request))
+				
+		return HttpResponseRedirect("/"+ username)

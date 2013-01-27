@@ -1,13 +1,160 @@
+<!DOCTYPE html>
 <html>
 <head>
+	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap.no-icons.min.css" rel="stylesheet" media="screen">
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
+	<script src="http://code.jquery.com/jquery-latest.js"></script>
+	<style>
+	body{
+		background-color:#AFDAEF;
+	}
+	.btn-custom {
+  		  background-color: hsl(198, 100%, 12%) !important;
+		  background-repeat: repeat-x;
+		  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#005c84", endColorstr="#002a3d");
+		  background-image: -khtml-gradient(linear, left top, left bottom, from(#005c84), to(#002a3d));
+		  background-image: -moz-linear-gradient(top, #005c84, #002a3d);
+		  background-image: -ms-linear-gradient(top, #005c84, #002a3d);
+		  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #005c84), color-stop(100%, #002a3d));
+		  background-image: -webkit-linear-gradient(top, #005c84, #002a3d);
+		  background-image: -o-linear-gradient(top, #005c84, #002a3d);
+		  background-image: linear-gradient(#005c84, #002a3d);
+		  border-color: #002a3d #002a3d hsl(198, 100%, 8.5%);
+		  color: #fff !important;
+		  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.23);
+		  -webkit-font-smoothing: antialiased;
+	}
+	.navbar-inner, .navbar .btn-navbar{
+		  background-color: hsl(198, 100%, 12%) !important;
+		  background-repeat: repeat-x;
+		  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#005c84", endColorstr="#002a3d");
+		  background-image: -khtml-gradient(linear, left top, left bottom, from(#005c84), to(#002a3d));
+		  background-image: -moz-linear-gradient(top, #005c84, #002a3d);
+		  background-image: -ms-linear-gradient(top, #005c84, #002a3d);
+		  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #005c84), color-stop(100%, #002a3d));
+		  background-image: -webkit-linear-gradient(top, #005c84, #002a3d);
+		  background-image: -o-linear-gradient(top, #005c84, #002a3d);
+		  background-image: linear-gradient(#005c84, #002a3d);
+		  border-color: #002a3d #002a3d hsl(198, 100%, 8.5%);
+		  color: #fff !important;
+		  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.23);
+		  -webkit-font-smoothing: antialiased;
+	}
+
+	.navbar .nav > li > a, .navbar .navbar-inner .brand{ 
+    	color: #fff !important;
+		text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.23);
+    }
+
+    .navbar .nav > li > a:hover, .navbar .navbar-inner .brand:hover{ 
+    	/**background-color: #002a3d !important;**/
+    	color: #FF8968 !important;
+		text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.23);
+    }
+
+    input:focus{
+    	border-color: #FFB968 !important;
+    }
+
+    .navbar .divider-vertical {
+    	
+	    background-color: #002a3d !important;
+	    border-left: 1px solid #002a3d;
+	    border-right: 1px solid #005c84;
+    } 
+
+	</style>
 </head>
 
 <body>
-	{% if request.user %}
+	<div class="row-fluid">
+	<div class="span12">
+	<div class="navbar" style="-webkit-border-radius: 0; -moz-border-radius: 0; border-radius: 0;">
+  		<div class="navbar-inner">
+  			<div class="container">
+	    	<a class="brand" href="/">Stitch-It!</a>
+	    	<ul class="nav" style="display: block;">
+	    		<li class="divider-vertical"></li>
+	    		{% if request.user.is_authenticated %}
+	      			<li><a href="/{{request.user.username}}/"> 
+	      				<i class="icon-user icon-white"></i> {{request.user.username}} </a>
+	      			</li>
+	      		{% endif %}
+	    		<li><a href="/{{request.user.username}}/untitled"> 
+	      			<i class="icon-magic icon-white"></i> Create</a>
+	      		</li>
+	      		<li><a href="/newsfeed/"> 
+	      			<i class="icon-globe icon-white"></i> Explore</a>
+	      		</li>
+	      		
+	      		
+	      	</ul>
 
-	<h1>Newsfeed page for {{request.user.username}}</h1>
+	      	<ul class="nav pull-right">
+	      		<li class="navbar-form pull-left">
+	      				<div class="input-prepend">
+	      				<span class="add-on"><i class="icon-search" style="color:#005c84;"></i></span>
+					<input type="text" id="browsebutton" placeholder="Search Projects"></div>
+					
+				</li>
 
+	      		{% if request.user.is_authenticated %}
+	      		<li><a href="/accounts/logout/" class="pull-right">Logout</a></li>
+	      		{% endif %}
+	      		<li> <a href="/settings/"><i class="icon-cog"></i></a></li>
+	   		
+    		</ul>
+    		</div>
+ 		</div>
+	</div>
+	</div>
+	</div>
 
+	<h1>Newsfeed</h1>
+
+	<form action="/newsfeed/" method="get">
+		{% if request.user.is_authenticated %}
+		<input type="radio" name="filter_people" value="following" {{following}}>People I'm Following<br/>
+		<input type="radio" name="filter_people" value="all" {{allpeople}}>Everybody<br/><br/>
+		{% endif %}
+		<input type="radio" name="filter_interval" value="hour" {{hours}}>In the last hour<br/>
+		<input type="radio" name="filter_interval" value="day" {{days}}>In the last day<br/>
+		<input type="radio" name="filter_interval" value="all" {{alltime}}>All time<br/><br/>
+		Priority:<br/>
+		<input type="radio" name="sort" value="likes" {{likes}}>Savers<br/>
+		<input type="radio" name="sort" value="published" {{datepub}}>Date published<br/>
+		<div class="input-append">
+			<input type="text" name="search" placeholder="Search" value="{{words}}">
+
+			<input type="submit" value="Go" class="btn btn-custom">
+			<!--<button class="btn" type="button">Go!</button>-->
+			
+		</div>
+
+	</form>
+
+	{% if patternset %}
+		{% for pattern in patternset%}
+		<div class="patternbox">
+			<div class="patternimage" instructions="{{pattern.instructions}}" style="height:200px; width:200px; background-color:#FFB968;">
+			</div>
+			<div class="patterninfo">
+				<div class="patternname">
+					<a href="/{{pattern.user.username}}/{{pattern.id}}/">{{pattern.name}}</a> by 
+					<a href="/{{pattern.user.username}}/">{{pattern.user.username}}</a>
+				</div>
+				<div class="patterncreated">{{pattern.date_published|date}}</div>
+				<div class="patternlikes">{{pattern.likes}} saver{{pattern.likes|pluralize}}</div>
+				<div class="patterntagset">
+					{% for tag in pattern.tag_set.all %}
+					<span class="patterntag">{{tag.content}}</span>
+					{% endfor %}
+				</div>
+				<!--<div class="patternlikes">{{pattern.likes}} likes</div>-->
+			</div>
+		</div>
+		{% endfor %}
 	{% endif %}
+
 </body>
 </html>

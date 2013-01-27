@@ -147,7 +147,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'crochetDev.patterns',
     'crochetDev.members',
-    'storages'
+    'storages',
+    'south',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -195,3 +196,6 @@ STATIC_URL = S3_URL
 
 AWS_ACCESS_KEY_ID = 'AKIAI6T5XIT62DUQG4YQ'
 AWS_SECRET_ACCESS_KEY = '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'
+
+# Close the session when user closes the browser
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
