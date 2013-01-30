@@ -48,6 +48,7 @@ $(function() {
     cX = $("canvas").attr("width")/2;
     cY = $("canvas").attr("height")/2;
     c.translate(cX, cY);
+    c.save();
 
     //must begin by adding a row
     //every row must end with addCluster();
@@ -65,34 +66,48 @@ $(function() {
     addStitch(new Stitch("HDC"));
     addCluster();
     addStitch(new Stitch("HDC"));
-    // addCluster();
+    addCluster();
 
     addRow();
-    // addStitch(new Stitch("HDC"));
-    // addStitch(new Stitch("HDC"));
-    // addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
 
-    // skipStitch();
-    // skipStitch();
-    // addStitch(new Stitch("HDC"));
+    skipStitch();
+    skipStitch();
+    addStitch(new Stitch("HDC"));
 
-    // addStitch(new Stitch("HDC"));
-    // addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    skipStitch();
     // skipStitch();
-    // // skipStitch();
-    // addStitch(new Stitch("HDC"));
-    // addStitch(new Stitch("HDC"));
-    // addStitch(new Stitch("HDC"));
-    // addRow();
-
-    // addStitch(new Stitch("HDC"));
-    // // addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addStitch(new Stitch("HDC"));
+    addRow();
+    addStitch(new Stitch("HDC"));
+    skipStitch();
+    addStitch(new Stitch("HDC"));
+    addChain();
+    addChain();
     // addChain();
-    // // addChain();
-    // // addChain();
-    // // addChain();
+    // addChain();
+    // addChain();
+    // addChain();
+    // addChain();
+    // addChain();
+    // addChain();
 
-    // //WHY LOOPING HERE? addChain();
+    addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    // addStitch(new Stitch("HDC"));
+    skipStitch();
+    skipStitch();
+    // skipStitch();
+    addStitch(new Stitch("HDC"));
+
+
+
 
 
     // addStitch(new Stitch("HDC"));
@@ -140,16 +155,17 @@ $(function() {
                 rotateStitchesInCluster(stitch.prevStitch.x, stitch.prevStitch.cluster, (offset - stitch.prevStitch.angle));
             }
 
-            rotateStitchAdd(stitch,
+            rotateStitch(stitch,
                 -Math.PI/2 + (curAngle -slant*stitch.dir+ Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height)));
 
         } else if (curY == 0 && !foundation) {
             var angle = -getStitchY(curX-1, rows[curX-1]['stitches'] - curCluster - 1).angle;
             //var angle = -stitch.prevStitch.angle;
-            rotateStitchAdd(stitch, angle);
+            rotateStitch(stitch, angle);
         } else if (!foundation) {
 
             if (stitch.prevStitch.stType == 'CH') {
+                stitch.prevStitch.chordAngle = stitch.prevStitch.chains.length * theta;
                 chainLogic(stitch);
                 if (rows[curX][curCluster][0].y == 0 && !foundation) {
                     rotateStitchesInCluster(curX, curCluster, -Math.atan(stitch.width/2 / stitch.height)
@@ -168,39 +184,36 @@ $(function() {
 
     }
 
-    function chainLogic(stitch) {
+    function chainLogic(stitch, limit) {
         var chain = stitch.prevStitch;
-        var angle = chain.chains.length * theta;
+        var angle = chain.chordAngle;
 
         if (chain.cluster == stitch.cluster && chain.x == stitch.x) {
-            var calculations = getChainAngle(angle, Math.PI, stitch);
-            var test = calculations.test;
+            var calculations = getChainAngle(angle, Math.PI, stitch, limit);
             angle = calculations.angle;
             var chordNode = calculations.chordNode;
             var chord = calculations.chord;
 
-            for (ch in chain.chains) {
-                chain.chains[ch].angle = test;
-            }
 
             //rotate chains back to original position to adjust width
-            rotateStitchAdd(chain, -chain.angle);
+            rotateStitch(chain, -chain.angle);
             chain.nodes[1].posX += chain.dir * (chord - chain.width)/2;
             chain.width = Math.sqrt(Math.pow(chord, 2) - Math.pow(Math.abs(chain.prevStitch.height - stitch.height), 2));
             //rotate chains to new position based on calculated angle
+
 
             rotateNextStitchInCluster(chain, angle/2 + Math.atan(chain.prevStitch.width / 2 / chain.prevStitch.height));
 
             //calculate angle of first chain to be added
 
             //draw chains with slant and next stitch
-            restoreCanvasToStitch(chain);
+            // restoreCanvasToStitch(chain);
 
             rotateNextStitchInCluster(stitch, angle/2 + Math.atan(stitch.width/2 / stitch.height));
 
 
             var heightOffset = distance(stitch.nodes[1], chain.origin);
-            rotateStitchAdd(chain, -chain.angle);
+            rotateStitch(chain, -chain.angle);
             chain.nodes[1].posY += heightOffset*Math.cos(angle/2) - chain.height;
             chain.height = heightOffset * Math.cos(angle/2);
             rotateNextStitchInCluster(chain, angle/2 + Math.atan(chain.prevStitch.width / 2 / chain.prevStitch.height));
@@ -211,7 +224,7 @@ $(function() {
 
             var radius1 = distance(chordNode, chain.origin)
             var radius2 = distance(chain.nodes[1], chain.origin);
-            if ((radius1 - radius2) * (distance(chordNode, chain.nodes[1]) - (radius1 + radius2)) < 0) {
+            if ((distance(chordNode, chain.nodes[1]) - (radius1 - radius2)) * (stitch.height - chain.prevStitch.height) < 0) {
                 chain.chSlantAngle *= -1;
             }
 
@@ -224,7 +237,13 @@ $(function() {
     function getChainAngle(angle, test, stitch, limit) {
         var chain = stitch.prevStitch;
         //TODO: implement check for chains completing a circle
-        if (chain.chains.length * chWidth < Math.abs(stitch.height - chain.prevStitch.height)) {
+        var chord = getSideFromAngle(
+                chain.prevStitch.height,
+                stitch.height,
+                angle
+                );
+        if (chain.chains.length * chWidth < Math.abs(stitch.height - chain.prevStitch.height)) {//} ||
+            // (chain.chains.length * chWidth < chord && limit == "angle")) {
             //check if aren't enough chains to span distance between stitches
             chordNode = makeNodeAt(chain.nodes[0]);
             chordNode.posX += chain.chains.length * chWidth;
@@ -236,25 +255,28 @@ $(function() {
             }
         }
 
-        var chord = getSideFromAngle(
-                chain.prevStitch.height,
-                stitch.height,
-                angle
-                );
         var test = Math.PI;
         var chordNode;
         var offset = chain.chains.length * chWidth;
+        var test2;
+        var tested = {};
         while (!(Math.abs(offset - chord) / chord < 0.01)) {
-            test -= (offset - chord) / chord * theta;
+            //prevent infinite loops
+            //TODO: will this work for everything? :O
+            var test3 = test - (offset - chord) / chord * theta;
+            if (Math.floor(test3) in tested) {
+                test3 = (test3 - test)*2 + test;
+                // test -= test3;
+            }
+            tested[test3] = true;
+            test = test3;
 
             chordNode = makeNodeAt(chain.nodes[0]);
 
             for (ch in chain.chains) {
                 chordNode.posX += Math.cos((Math.PI - test)*ch)*chWidth * stitch.dir;
                 chordNode.posY += -Math.sin((Math.PI - test)*ch) * chWidth;
-                // if (distance(chordNode, chain.nodes[0]) < chWidth) {
 
-                // }
             }
 
             //increment/decrement test angles and angle towards each other until offset == chord
@@ -268,33 +290,23 @@ $(function() {
                     angle
                     );
             }
-
         }
+
         if (angle > Math.PI) {
             angle = 2*Math.PI - angle;
         }
+        //prevent chain from going in circles with recursive call
+        if (Math.abs((Math.PI - test)*(chain.chains.length - 1)) > 2*Math.PI) {
+            return getChainAngle(angle*1.2, test*1.2, stitch, limit);
+        }
+
+        chain.chAngle = test;
+        chain.chordAngle = angle;
 
         return {'chord' : chord,
             'chordNode' : chordNode,
-            'angle' : angle,
-            'test' : test};
+            'angle' : angle};
     }
-
-    // function estimateAngle(chain, offset, chord, test, angle) {
-    //     if (Math.abs(offset - chord) < 0.01) {
-    //         return angle;
-    //     }
-    //     test -= (offset - chord) / chord * theta;
-    //     chordNode = makeNodeAt(chain.nodes[0]);
-    //     for (ch in chain.chains) {
-    //         chordNode.posX += Math.cos((Math.PI - test)*ch)*chWidth * stitch.dir;
-    //         chordNode.posY += -Math.sin((Math.PI - test)*ch) * chWidth;
-    //         if (distance(chordNode, chain.nodes[0]) < chWidth) {
-    //             return estimateAngle(offset, chord)
-    //         }
-    //     }
-    //     return estimateAngle()
-    // }
 
     function addNode(stitch) {
         /*Node convention
@@ -379,7 +391,7 @@ $(function() {
 
             addNode(stitch);
             rotateNextStitchInCluster(stitch);
-            // rotateStitchAdd(stitch, stitch.prevStitch.angle);
+            // rotateStitch(stitch, stitch.prevStitch.angle);
 
             adjustChWidth(stitch, 0);
         }
@@ -398,11 +410,11 @@ $(function() {
 
 
     function adjustChWidth(stitch, width) {
-        rotateStitchAdd(stitch, -stitch.angle);
+        rotateStitch(stitch, -stitch.angle);
         nodes[curX+1][curY+1].posX += stitch.dir * (width - stitch.width)/2;
         stitch.width = width;
         removeStitchesAfter(stitch);
-        rotateNextStitchInCluster(stitch);
+        rotateNextStitchInCluster(stitch, 0);
     }
 
     function addRow() {
@@ -469,10 +481,11 @@ $(function() {
         *Function to line up next stitch in a cluster with the corner of the previous.
         *If no angle is given, defaults to adding on angle between diagonals of stitch and previous stitch
         */
+        rotateStitch(stitch, -stitch.angle);
         if (angle == null) {
             var angle = Math.atan(stitch.width/2 / stitch.height) + Math.atan(stitch.prevStitch.width/2 / stitch.prevStitch.height);
         }
-        rotateStitchAdd(stitch, stitch.prevStitch.angle + angle);
+        rotateStitch(stitch, stitch.prevStitch.angle + angle);
     }
 
     function rotateStitch(stitch, angle) {
@@ -484,10 +497,6 @@ $(function() {
         restoreCanvasToStitch(stitch);
     }
 
-    function rotateStitchAdd(stitch, angle) {
-        rotateStitchNodes(stitch, angle);
-        addToCanvas(stitch);
-    }
     function rotateStitchNodes(stitch, angle) {
         stitch.angle += angle;
         angle *= stitch.dir;
@@ -507,12 +516,19 @@ $(function() {
         var cluster = rows[row][clusterNum];
         // rotateStitch(cluster[0], origin, angle);
         if (rows[row][clusterNum][0].y == 0 || cluster.length == 1) {
-            for (stitch in cluster) {//.slice(1)) {
+            for (stitch in cluster) {
                 rotateStitch(cluster[stitch], angle);
             }
         } else {
-            for (stitch in cluster) {//.slice(1)) {
-                rotateStitch(cluster[stitch], angle / (cluster.length - 1) * (stitch));
+            for (stitch in cluster) {
+                if (cluster[stitch].prevStitch.stType == "CH") {
+                    cluster[stitch].prevStitch.chordAngle += 2*angle / (cluster.length - 1);
+                    chainLogic(cluster[stitch], "angle");
+                    // rotateStitch(cluster[stitch], angle / (cluster.length - 1));
+
+                } else if (cluster[stitch].stType != "CH") {
+                    rotateStitch(cluster[stitch], angle / (cluster.length - 1) * (stitch));
+                }
             }
         }
     }
@@ -586,6 +602,8 @@ $(function() {
         this.params;
         this.cluster;
         this.chSlantAngle = 0;
+        this.chAngle = Math.PI;
+        this.chordAngle = 0;
         if (stitch != "CH") {
         this.width = STITCH_IMGS[this.stType]["WIDTH"];
             this.height = STITCH_IMGS[this.stType]["HEIGHT"];
@@ -613,7 +631,6 @@ $(function() {
         this.stitch.chains.push(this);
         this.prevChain;
         this.dir = stitch.dir;
-        this.angle = Math.PI;
         this.nodes = {};
         this.width = STITCH_IMGS["ch"]["WIDTH"];
         this.height = STITCH_IMGS["ch"]["HEIGHT"];
@@ -624,6 +641,9 @@ $(function() {
     function addToCanvas(stitch) {
 
         var prevOrigin;
+
+
+
         if (rows[stitch.x][stitch.cluster][0] == stitch && !(stitch.y == 0 && stitch.x == 0)) {
             if (stitch.y != 0) {
                 prevOrigin = stitch.prevStitch.origin;
@@ -643,6 +663,9 @@ $(function() {
 
         } else {
             c.save();
+            if (stitch.y == curY && stitch.x == curX) {
+                c.fillStyle = "rgb(175, 218, 239)";
+            }
             c.rotate(stitch.dir*stitch.angle);
             c.fillRect(-stitch.width / 2, -stitch.height, stitch.width, stitch.height);
             c.restore();
@@ -655,22 +678,27 @@ $(function() {
         var xOffset = stitch.prevStitch.nodes[1].posX - stitch.prevStitch.origin.posX;
         var yOffset = stitch.prevStitch.origin.posY - stitch.prevStitch.nodes[1].posY;
 
-        // c.save();
-        // c.globalAlpha = 0.2;
-        // c.rotate(stitch.dir * stitch.angle);
-        // c.fillRect(-stitch.width / 2, -stitch.height, stitch.width, stitch.height);
-        // c.restore();
+        c.save();
+        c.globalAlpha = 0.2;
+        c.rotate(stitch.dir * stitch.angle);
+        c.fillRect(-stitch.width / 2, -stitch.height, stitch.width, stitch.height);
+        c.restore();
 
         c.translate(xOffset, yOffset);
         c.rotate(stitch.dir * stitch.angle);
         c.rotate(stitch.dir * stitch.chSlantAngle);
 
         for (ch in stitch.chains) {
-            var angle = Math.PI - stitch.chains[ch].angle;
+            c.fillStyle = "gray";
+            if (ch == stitch.chains.length - 1 && stitch.x == curX && stitch.y == curY) {
+                c.fillStyle = "rgb(175, 218, 239)";
+            }
+            var angle = Math.PI - stitch.chAngle;
             c.fillRect((stitch.dir - 1)/2 * chWidth, -stitch.chains[ch].height/2,
                 stitch.chains[ch].width, stitch.chains[ch].height);
             c.translate(chWidth*stitch.dir, 0);
             c.rotate(angle*stitch.dir);
+
         }
 
         c.restore();
