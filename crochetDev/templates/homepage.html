@@ -89,14 +89,14 @@
 	    	<a class="brand" href="/">Stitch-It!</a>
 	    	<ul class="nav" style="display: block;">
 	    		<li class="divider-vertical"></li>
-	    		{% if reques.user.is_authenticated %}
+	    		{% if request.user.is_authenticated %}
 	      			<li><a href="/{{request.user.username}}/"> 
 	      				<i class="icon-user icon-white"></i> {{request.user.username}} </a>
 	      			</li>
-	      		{% endif %}
-	    		<li><a href="/{{request.user.username}}/untitled"> 
+	      			<li><a href="/{{request.user.username}}/untitled"> 
 	      			<i class="icon-magic icon-white"></i> Create</a>
-	      		</li>
+	      			</li>
+	      		{% endif %}
 	      		<li><a href="/newsfeed/"> 
 	      			<i class="icon-globe icon-white"></i> Explore</a>
 	      		</li>
@@ -115,7 +115,7 @@
 	      		{% if request.user.is_authenticated %}
 	      		<li><a href="/accounts/logout/" class="pull-right">Logout</a></li>
 	      		{% endif %}
-	      		<li> <a href="/settings/"><i class="icon-cog"></i></a></li>
+	      		<li> <a href="//"><i class="icon-cog"></i></a></li>
 	   		
     		</ul>
     		</div>
