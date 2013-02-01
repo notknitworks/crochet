@@ -14,7 +14,7 @@
 .addedStitch span:first-child
 {
 	padding-left: 5px;
-	
+
 }
 .addedStitch span:last-child
 {
@@ -23,12 +23,12 @@
 }
 .right
 {
-	background-color:#59D659;
+	border:#59D659;
 }
 .wrong
 {
-	background-color:#8F0E0E;
-	color: white;
+	/*background-color:#8F0E0E;*/
+	/*color: white;*/
 }
 input
 {

@@ -3,85 +3,41 @@ var pattern = new Array();
 
 $(document).ready(function(){
 	$("#addRowButton").click(function(){
-		numRows ++;
 		createNextRow();
 	});
 
 	$(".edit").keyup(function(event){
-		var keycode = (event.keyCode ? event.keyCode : event.which);
-		if(! (keycode == '13' || keycode == '188')) return;
-		userEnter($(this));
+		editHandler($(this));
+
 	});
 
-	$(".edit").keydown(function(event){
+});
+
+	function editHandler($row) {
 		var keycode = (event.keyCode ? event.keyCode : event.which);
 		if(keycode == '13'){
 			event.preventDefault();
-		}if (keycode == '8'){
+		} else if (keycode == '8'){
 			var sel = window.getSelection();
 			var anchor = sel.anchorNode;
 
-			if(sel.anchorNode.nodeType == 3) return;
+			if(sel.anchorNode.nodeType == 3) {
+				var removed = $row.children('addedStitch').last();
+				// return;
+			}
 			if(sel.anchorNode.nodeType == 1){
 				event.preventDefault();
-				var removed = $(this).children('span')[sel.anchorOffset-1];
-				$(removed).remove();
+				var removed = $row.children('span')[sel.anchorOffset-1];
+				// console.log("HI");
+				// $(removed).remove();
 			}
-		}
-	});
-	// $.ajax({
-	// 	type: "GET",
-	// 	dataType: "JSON",
-	// 	data: {"pattern":"pattern 2"},
-	// 	success: function(data) {
-	// 		$("#interface").data("pattern", data);
-	// 		parsePattern(data);
-	// 		console.log("pattern loaded");
-	// 	},
-	// 	error: function() {
-	// 		console.log("error loading pattern");
-	// 	}
-	// })
+			var deletedY = $row.children().not(":contains('sk')").toArray().indexOf(removed);
+			var deletedX = $('.edit').toArray().indexOf($row[0]);
+			editPattern("", deletedX, deletedY, false);
 
-	// $.getJSON("/accounts/login/", {"pattern":"pattern"},
-	// 	function(data){
-	// 		$("#interface").data("pattern", data);
-	// 		parsePattern(data);
-	// 		console.log("pattern loaded");
-	// });
-
-
-	//example format for saving patterns
-	// var testData = {
-	// 	0:{
-	// 		0:["HDC"],
-	// 		1:["HDC"],
-	// 		2:["HDC"],
-	// 		3:["HDC"],
-	// 	},
-	// 	1: {
-	// 		0:["HDC", "HDC"],
-	// 		1:[],
-	// 		2:["HDC", "HDC", "HDC"],
-	// 		3:["HDC"]
-	// 	},
-	// 	2: {
-	// 		0:["HDC", "HDC"],
-	// 	}
-	// };
-
-	// $("#interface").data("pattern", testData);
-	// parsePattern(0, 0);
-
-	// editPattern("HDC", 2, 0, false);
-	// editPattern("HDC", 2, 0, true);
-	// $(".pattern").load(function() {
-	// 		console.log("HI");
-	// 		$("#interface").data("pattern", $(this).attr("pattern"));
-	// 		console.log($("#interface").data("pattern"));
-	// parsePattern($.parseJSON($("#interface").data("pattern")));
-	// });
-});
+		} else if(! (keycode == '13' || keycode == '188')) return;
+		userEnter($(this));
+	}
 
 	function loadPatternText() {
 		$('.edit').focus();
@@ -90,7 +46,7 @@ $(document).ready(function(){
 			var rowText = $($('.edit')[i]);
 			var row = [];
 			for (j in pattern[i]) {
-				if (j.length == 0) {
+				if (pattern[i][j].length == 0) {
 					row.push("sk");
 				} else {
 					for (st in pattern[i][j]) {
@@ -103,10 +59,8 @@ $(document).ready(function(){
 				}
 			}
 			rowText.html(row.join(","));
-			loadUserEnter(row);
-			row
-			// userEnter(rowText);
-			// createNextRow();
+			userEnter(rowText, rowText.contents().last()[0]);
+			createNextRow();
 		}
 	}
 
@@ -221,6 +175,7 @@ $(document).ready(function(){
     each row conains a <div> element with contenteditable set to true; this
     is where the user would type in new stitches*/
 function createNextRow(){
+	numRows ++;
 	$nextRow = $('<tr><td>Row ' + numRows + ':</td>' +
 				'<td><div contenteditable="true" class="edit" style="width:500px;border:1px solid black;"></div></td');
 	//latest row has the addrow button and feedback div
@@ -231,26 +186,7 @@ function createNextRow(){
 
 	//set up the enter handler
 	$nextRow.find('.edit').keyup(function(event){
-		var keycode = (event.keyCode ? event.keyCode : event.which);
-		if(! (keycode == '13' || keycode == '188')) return;
-		userEnter($(this));
-	});
-
-	$nextRow.find('.edit').keydown(function(event){
-		var keycode = (event.keyCode ? event.keyCode : event.which);
-		if(keycode == '13'){
-			event.preventDefault();
-		}if (keycode == '8'){
-			var sel = window.getSelection();
-			var anchor = sel.anchorNode;
-
-			if(sel.anchorNode.nodeType == 3) return;
-			if(sel.anchorNode.nodeType == 1){
-				event.preventDefault();
-				var removed = $(this).children('span')[sel.anchorOffset-1];
-				$(removed).remove();
-			}
-		}
+		editHandler($(this));
 	});
 
 	addRow();
@@ -279,8 +215,8 @@ function savePattern() {
 		<span class="delStitch">x</span>
    </span>
 
-   Then goes on to assign the apprpriate handlers to each of the spans. 
-	
+   Then goes on to assign the apprpriate handlers to each of the spans.
+
    1. put in html into the proper row
    2. focus on the row input
    3. find text node by doing $('.edit').contents().last()[0]
@@ -307,6 +243,7 @@ function userEnter(newRow, textnode){
 
 		stitchBox.innerHTML = parsedStitch.html;
 		newBox.classList.add("addedStitch");
+		newBox.classList.add("btn");
 		newBox.classList.add(parsedStitch.valid);
 		xBox.innerHTML = "x";
 		xBox.classList.add("delStitch");
@@ -346,29 +283,6 @@ function userEnter(newRow, textnode){
 	}
 };
 
-function loadUserEnter(row) {
-	var stitches = row.html().split(",");
-	for (x in stitches) {
-		var stitch = stitches[x].trim();
-		var stitchBox = $("<span>" + (new parseInput(stitch)).html + "</span>");
-		xBox = $("<span class='delStitch'>x</span>");
-		var newBox = $("<span class='addedStitch right'></span>");
-		newBox.append(stitchBox).append(xBox);
-		row.append(newBox);
-	}
-	row.html("<"+row1.html().split("<").slice(1).join("<"))
-	row.children().click(function(){
-			makeEditable($(this))
-		}).keyup(function(){
-			stitchkeyup($(this));
-		}).blur(function(){
-			makeUneditable($(this));
-		});
-
-	row.children.children('.delStitch').click(function(){ delParent($(this));});
-
-
-}
 
 function parseInput(text){
 	if(text == "" || text == ",") return "";
