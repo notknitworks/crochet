@@ -42,6 +42,9 @@ $(document).ready(function(){
 	function loadPatternText() {
 		$('.edit').focus();
 		var pattern = $("#interface").data("pattern");
+		if (pattern[0].length == 0 && !(1 in pattern)) {
+			return;
+		}
 		for (i in pattern) {
 			var rowText = $($('.edit')[i]);
 			var row = [];
@@ -227,6 +230,8 @@ function savePattern() {
 function userEnter(newRow, textnode){
 	if (textnode == null){
 		textnode = window.getSelection().anchorNode;
+	} else if (textnode == "") {
+		return;
 	}
 	var node = textnode;
 	var text = node.textContent;
