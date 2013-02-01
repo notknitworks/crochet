@@ -52,26 +52,26 @@ $(document).ready(function(){
 
 
 	//example format for saving patterns
-	var testData = {
-		0:{
-			0:["HDC"],
-			1:["HDC"],
-			2:["HDC"],
-			3:["HDC"],
-		},
-		1: {
-			0:["HDC", "HDC"],
-			1:[],
-			2:["HDC", "HDC", "HDC"],
-			3:["HDC"]
-		},
-		2: {
-			0:["HDC", "HDC"],
-		}
-	};
+	// var testData = {
+	// 	0:{
+	// 		0:["HDC"],
+	// 		1:["HDC"],
+	// 		2:["HDC"],
+	// 		3:["HDC"],
+	// 	},
+	// 	1: {
+	// 		0:["HDC", "HDC"],
+	// 		1:[],
+	// 		2:["HDC", "HDC", "HDC"],
+	// 		3:["HDC"]
+	// 	},
+	// 	2: {
+	// 		0:["HDC", "HDC"],
+	// 	}
+	// };
 
-	$("#interface").data("pattern", testData);
-	parsePattern(0, 0);
+	// $("#interface").data("pattern", testData);
+	// parsePattern(0, 0);
 
 	// editPattern("HDC", 2, 0, false);
 	// editPattern("HDC", 2, 0, true);
