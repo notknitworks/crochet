@@ -137,7 +137,14 @@
 
 			});
 
-			var instructions = eval('(' + $("#interface").attr("instructions") + ')');
+			var instructions;
+
+			if ($("#interface").attr("instructions") == ""){
+				instructions = {0:[]};
+			} else{
+				instructions = eval('(' + $("#interface").attr("instructions") + ')');	
+			}
+			
 			$("#interface").data("pattern", instructions);
 			// parsePattern(0, 0);
 			loadPatternText();
