@@ -83,6 +83,29 @@ $(document).ready(function(){
 	// });
 });
 
+	function loadPatternText() {
+		$('.edit').focus();
+		var pattern = $("#interface").data("pattern");
+		for (i in pattern) {
+			var row = [];
+			for (j in pattern[i]) {
+				if (j.length == 0) {
+					row.push("sk");
+				} else {
+					for (st in pattern[i][j]) {
+						if (st == 1) {
+							row.push(st.toLowerCase());
+						} else {
+							row.push(st.toLowerCase() + " in same stitch");
+						}
+					}
+				}
+			}
+			userEnter($($('.edit')[i]));
+			createNextRow();
+		}
+	}
+
 	/*
 	takes in an object with a stitch type (string), row number, stitch y number,
 	cluster number, and boolean for add or delete
@@ -199,6 +222,7 @@ function createNextRow(){
 	//latest row has the addrow button and feedback div
 	$nextRow.append($("#addRowButton"));
 	$nextRow.append($("#feedback"));
+	$nextRow.focus();
 	$("#patternTable").append($nextRow);
 
 	//set up the enter handler
