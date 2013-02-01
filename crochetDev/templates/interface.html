@@ -140,6 +140,7 @@
 			var instructions = eval('(' + $("#interface").attr("instructions") + ')');
 			$("#interface").data("pattern", instructions);
 			parsePattern(0, 0);
+			loadPatternText();
 		});
 
 		function saveinstructions(button){
@@ -255,8 +256,8 @@
 	</div>
 	</div>
 
-	<div class="row">
-		<div class="span4">
+	<div class="row-fluid">
+		<div class="span3">
 			<div class="nav nav-list">
 					<table id="patternTable">
 		<tr>
@@ -305,9 +306,9 @@
 
 		</div>
 
-		<div class="span9">
+		<div class="span6">
 
-			<canvas id="interface" width="960" height="600" instructions="{{pattern.instructions}}"></canvas>
+			<canvas id="interface" height="600" instructions="{{pattern.instructions}}"></canvas>
 			<button type="button" class="btn btn-custom" id="saveinstructions" patternid="{{pattern.id}}"> Save </button>
 
 

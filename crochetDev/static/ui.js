@@ -41,6 +41,9 @@ var STITCH_IMGS = {
     }
 };
 $(function() {
+    $("canvas").attr('width', $("canvas").parent().width());
+    // $("canvas").attr('height', $("canvas").parent().height());
+
 
     c = $("canvas")[0].getContext("2d");
     c.save();
