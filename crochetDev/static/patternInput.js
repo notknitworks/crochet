@@ -275,9 +275,20 @@ function savePattern() {
 		<span class="delStitch">x</span>
    </span>
 
-   Then goes on to assign the apprpriate handlers to each of the spans. */
-function userEnter(newRow){
-	var node = window.getSelection().anchorNode;
+   Then goes on to assign the apprpriate handlers to each of the spans. 
+	
+   1. put in html into the proper row
+   2. focus on the row input
+   3. find text node by doing $('.edit').contents().last()[0]
+   4. that text node becomes the second argument
+
+
+   */
+function userEnter(newRow, textnode){
+	if (textnode == null){
+		textnode = window.getSelection().anchorNode;
+	}
+	var node = textnode;
 	var text = node.textContent;
 	var stitches = text.split(",");
 
