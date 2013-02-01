@@ -6,7 +6,7 @@ $(document).ready(function(){
 		createNextRow();
 	});
 
-	$(".edit").keyup(function(event){
+	$(".edit").keypress(function(event){
 		editHandler($(this));
 
 	});
@@ -15,8 +15,9 @@ $(document).ready(function(){
 
 	function editHandler($row) {
 		var keycode = (event.keyCode ? event.keyCode : event.which);
-		if(keycode == '13'){
+		if(keycode == '13' || keycode == "188"){
 			event.preventDefault();
+			userEnter($row);
 		} else if (keycode == '8'){
 			var sel = window.getSelection();
 			var anchor = sel.anchorNode;
@@ -36,7 +37,6 @@ $(document).ready(function(){
 			editPattern("", deletedX, deletedY, false);
 
 		} else if(! (keycode == '13' || keycode == '188')) return;
-		userEnter($(this));
 	}
 
 	function loadPatternText() {
@@ -230,8 +230,10 @@ function savePattern() {
 function userEnter(newRow, textnode){
 	if (textnode == null){
 		textnode = window.getSelection().anchorNode;
-	} else if (textnode == "") {
-		return;
+	}
+	if (newRow.contents('br').length > 0) {
+		textnode = newRow.contents()[newRow.contents().toArray().indexOf($('br')[0]) - 1];
+		newRow.contents('br').remove();
 	}
 	var node = textnode;
 	var text = node.textContent;
