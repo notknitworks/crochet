@@ -91,7 +91,7 @@
 				saveinstructions($(this));
 			});
 
-			$("#row")[0].disabled = true;
+			//$("#row")[0].disabled = true;
 			$(".stitchInput").click(function() {
 				var id = $(this).attr('id');
 				switch(id) {
@@ -132,6 +132,10 @@
 				}
 
 			});
+
+			var instructions = eval('(' + $("#interface").attr("instructions") + ')');
+			$("#interface").data("pattern", instructions);
+			parsePattern(0, 0);
 		});
 
 		function saveinstructions(button){
@@ -270,7 +274,7 @@
 		</div>
 
 		<div class="span9">
-			<canvas id="interface" width="960" height="600"></canvas>
+			<canvas id="interface" width="960" height="600" instructions="{{pattern.instructions}}"></canvas>
 			<button type="button" class="btn btn-custom" id="saveinstructions" patternid="{{pattern.id}}"> Save </button>
 
 
