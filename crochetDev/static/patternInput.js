@@ -87,22 +87,26 @@ $(document).ready(function(){
 		$('.edit').focus();
 		var pattern = $("#interface").data("pattern");
 		for (i in pattern) {
+			var rowText = $($('.edit')[i]);
 			var row = [];
 			for (j in pattern[i]) {
 				if (j.length == 0) {
 					row.push("sk");
 				} else {
 					for (st in pattern[i][j]) {
-						if (st == 1) {
-							row.push(st.toLowerCase());
+						if (st == 0) {
+							row.push(pattern[i][j][st].toLowerCase());
 						} else {
-							row.push(st.toLowerCase() + " in same stitch");
+							row.push(pattern[i][j][st].toLowerCase() + " in same stitch");
 						}
 					}
 				}
 			}
-			userEnter($($('.edit')[i]));
-			createNextRow();
+			rowText.html(row.join(","));
+			loadUserEnter(row);
+			row
+			// userEnter(rowText);
+			// createNextRow();
 		}
 	}
 
@@ -330,6 +334,30 @@ function userEnter(newRow){
 		(newRow.get(0)).removeChild(document.activeElement.parentNode);
 	}
 };
+
+function loadUserEnter(row) {
+	var stitches = row.html().split(",");
+	for (x in stitches) {
+		var stitch = stitches[x].trim();
+		var stitchBox = $("<span>" + (new parseInput(stitch)).html + "</span>");
+		xBox = $("<span class='delStitch'>x</span>");
+		var newBox = $("<span class='addedStitch right'></span>");
+		newBox.append(stitchBox).append(xBox);
+		row.append(newBox);
+	}
+	row.html("<"+row1.html().split("<").slice(1).join("<"))
+	row.children().click(function(){
+			makeEditable($(this))
+		}).keyup(function(){
+			stitchkeyup($(this));
+		}).blur(function(){
+			makeUneditable($(this));
+		});
+
+	row.children.children('.delStitch').click(function(){ delParent($(this));});
+
+
+}
 
 function parseInput(text){
 	if(text == "" || text == ",") return "";
