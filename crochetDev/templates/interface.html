@@ -5,6 +5,7 @@
 	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap.no-icons.min.css" rel="stylesheet" media="screen">
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
   	<script src="{{STATIC_URL}}ui.js"></script>
+  	<script src="{{STATIC_URL}}patternInput.js"></script>
   		<style>
 	body{
 		background-color:#AFDAEF;
@@ -42,12 +43,12 @@
 		  -webkit-font-smoothing: antialiased;
 	}
 
-	.navbar .nav > li > a, .navbar .navbar-inner .brand{ 
+	.navbar .nav > li > a, .navbar .navbar-inner .brand{
     	color: #fff !important;
 		text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.23);
     }
 
-    .navbar .nav > li > a:hover, .navbar .navbar-inner .brand:hover{ 
+    .navbar .nav > li > a:hover, .navbar .navbar-inner .brand:hover{
     	/**background-color: #002a3d !important;**/
     	color: #FF8968 !important;
 		text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.23);
@@ -58,11 +59,17 @@
     }
 
     .navbar .divider-vertical {
-    	
+
 	    background-color: #002a3d !important;
 	    border-left: 1px solid #002a3d;
 	    border-right: 1px solid #005c84;
-    } 
+    }
+
+    /** sidebar styles **/
+    .nav-list {
+    	background-color: white;
+    	border-radius: 0 3px 3px 0;
+    }
 
 	</style>
 	<script type="text/javascript">
@@ -193,18 +200,18 @@
 	    	<ul class="nav" style="display: block;">
 	    		<li class="divider-vertical"></li>
 	    		{% if request.user.is_authenticated %}
-	      			<li><a href="/{{request.user.username}}/"> 
+	      			<li><a href="/{{request.user.username}}/">
 	      				<i class="icon-user icon-white"></i> {{request.user.username}} </a>
 	      			</li>
-	      			<li><a href="/{{request.user.username}}/untitled"> 
+	      			<li><a href="/{{request.user.username}}/untitled">
 	      			<i class="icon-magic icon-white"></i> Create</a>
 	      			</li>
 	      		{% endif %}
-	      		<li><a href="/newsfeed/"> 
+	      		<li><a href="/newsfeed/">
 	      			<i class="icon-globe icon-white"></i> Explore</a>
 	      		</li>
-	      		
-	      		
+
+
 	      	</ul>
 
 	      	<ul class="nav pull-right">
@@ -212,14 +219,14 @@
 	      				<div class="input-prepend">
 	      				<span class="add-on"><i class="icon-search" style="color:#005c84;"></i></span>
 					<input type="text" id="browsebutton" placeholder="Search Projects"></div>
-					
+
 				</li>
 
 	      		{% if request.user.is_authenticated %}
 	      		<li><a href="/accounts/logout/" class="pull-right">Logout</a></li>
 	      		{% endif %}
 	      		<li> <a href="//"><i class="icon-cog"></i></a></li>
-	   		
+
     		</ul>
     		</div>
  		</div>
@@ -227,7 +234,10 @@
 	</div>
 	</div>
 
-	<h1> {{pattern.name}} by {{pattern.user.username}} </h1>
+	<div class="row">
+		<div class="span3">
+			<div class="nav nav-list">
+	<h3> {{pattern.name}} by {{pattern.user.username}} </h3>
 	<!-- must be viewing someone else's and logged in to have option to save -->
 	{% if pattern.user != request.user and user.is_authenticated %}
 		<!-- pattern has been saved by user and option is to remove -->
@@ -242,6 +252,18 @@
 			</button>
 		{% endif %}
 	{% endif %}
+
+			</div>
+		</div>
+
+		<div class="span9">
+			<canvas id="interface" width="960" height="600"></canvas>
+
+
+
+		</div>
+
+	</div>
 
 	<!--div class="patternbox">
 			<div class="patternimage" instructions="{{pattern.instructions}}" style="height:400px; width:400px; background-color:#FFB968;">
@@ -260,16 +282,15 @@
 				</div>
 			</div>
 	</div-->
-	<button id="skip" type="button" class="stitchInput" >skip a stitch</button>
+<!-- 	<button id="skip" type="button" class="stitchInput" >skip a stitch</button>
 	<button id="cluster" type="button" class="stitchInput" >add a cluster</button>
 	<button id="row" type="button" class="stitchInput" >add row</button>
 	<button id="SC" type="button" class="stitchInput" >sc (short stitch)</button>
 	<button id="HDC" type="button" class="stitchInput" >hdc (medium stitch)</button>
 	<button id="DC" type="button" class="stitchInput" >dc (tall stitch)</button>
-	<button id="ch" type="button" class="stitchInput" >chain (unattached stitch)</button>
+	<button id="ch" type="button" class="stitchInput" >chain (unattached stitch)</button> -->
 
 
-	<canvas id="interface" width="960" height="600"></canvas>
 
 	{% if pattern.user != request.user and user.is_authenticated %}
 		<button> Export </button>

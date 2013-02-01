@@ -69,9 +69,12 @@ $(document).ready(function(){
 			0:["HDC", "HDC"],
 		}
 	};
-	$("#interface").data("pattern", testData);
-	parsePattern(testData);
 
+	$("#interface").data("pattern", testData);
+	parsePattern(0, 0);
+
+	editPattern("HDC", 2, 0, false);
+	editPattern("HDC", 2, 0, true);
 	// $(".pattern").load(function() {
 	// 		console.log("HI");
 	// 		$("#interface").data("pattern", $(this).attr("pattern"));
@@ -80,26 +83,110 @@ $(document).ready(function(){
 	// });
 });
 
+	/*
+	takes in an object with a stitch type (string), row number, stitch y number,
+	cluster number, and boolean for add or delete
+	*/
+	function editPattern(stitch, x, y, add) {
+		var data = $("#interface").data("pattern");
+		var index = getClusterNum(x, y);
+		if (add) {
+			data[x][index.cluster].splice(index.clusterNum, 0, stitch);
+		} else {
+			data[x][index.cluster].splice(index.clusterNum, 1);
+		}
 
-	function parsePattern(pattern) {
-		var row = 0;
-		var cluster = 0;
+		curX = x;
+		curY = y;
+		curCluster = index.cluster;
 
-		while (row in pattern) {
-			addRow();
-			while (cluster in pattern[row]) {
-				if (pattern[row][cluster].length == 0) {
+		removeStitchesAfter(getStitchY(x, y));
+		for (i in rows) {
+			if (i > x ) {
+				delete rows[x];
+			} else if (y == 0 && i == x) {
+				delete rows[x];
+				curX--;
+			} else if (i == x) {
+				for (j in rows[x]) {
+					if (j == index.cluster) {
+						rows[x]['stitches'] -= rows[x][j].length - index.clusterNum;
+						rows[x][j] = rows[x][j].slice(0, index.clusterNum);
+					} else if (j > index.cluster) {
+						rows[x]['stitches'] -= rows[x][j].length;
+						delete rows[x][j];
+					}
+				}
+			}
+		}
+
+		parsePattern(x, y);
+	}
+
+	/*
+	from data, given a stitch.x and stitch.y, calculate its cluster and and cluster index.
+	modifies data and stitches to add an array
+	*/
+	function getClusterNum(x, y) {
+		var data = $("#interface").data("pattern");
+		if (x < 0 || y < 0) {
+            console.log("error getting stitch "+y+" row "+row);
+            return null;
+        } else if (!(x in data)) {
+        	//create a new row
+        	data[x] = {
+        		0: []
+        	}
+        	return {
+        		'cluster' : 0,
+        		'clusterNum' : 0
+        	};
+        }
+        var clusters = data[x][0].length;
+        var cur = 0;
+        try {
+	        while (y >= clusters) {
+	        	cur++;
+	        	clusters += data[x][cur].length;
+	        }
+	    } catch(err) {
+        	//create a new cluster
+        	console.log("creating cluster");
+        	data[x][cur] = [];
+        	rows[x][cur] = [];
+        	return {'cluster' : cur,
+        			'clusterNum' : 0};
+    	}
+
+		return {'cluster' : cur,
+        			'clusterNum' : data[x][cur].length - (clusters - y)};
+	}
+
+	function parsePattern(x, y) {
+		var pattern = $("#interface").data("pattern");
+
+		var cluster = getClusterNum(x, y).cluster;
+
+		while (x in pattern) {
+			if (! (x in rows)) {
+				addRow();
+			}
+			while (cluster in pattern[x]) {
+				console.log("entering cluster")
+				if (pattern[x][cluster].length == 0) {
 					skipStitch();
 				} else {
-					for (var i=0; i < pattern[row][cluster].length; i++) {
-						addStitch(new Stitch(pattern[row][cluster][i]));
+					for (var i=0; i < pattern[x][cluster].length; i++) {
+						addStitch(new Stitch(pattern[x][cluster][i]));
+						console.log("stitch added");
 					}
 					addCluster();
 				}
 				cluster++;
 			}
+			y = 0;
 			cluster = 0;
-			row++;
+			x++;
 		}
 		curCluster--;
 	}
