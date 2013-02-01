@@ -269,6 +269,16 @@ def savepattern(request):
 
 	return HttpResponse(json.dumps({}), content_type="application/json")
 
+def saveinstructions(request):
+	id = request.GET['patternid']
+	patterns = Pattern.objects.filter(id=id)
+	if len(patterns) == 1:
+		pattern = patterns[0]
+		pattern.instructions = request.GET['instructions']
+		pattern.save()
+	return HttpResponse(json.dumps({}), content_type="application/json")
+
+
 def removepattern(request):
 	name = request.GET['person']
 	creator = User.objects.filter(username=name)[0]
