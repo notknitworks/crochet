@@ -62,7 +62,7 @@ $(document).ready(function(){
 		1: {
 			0:["HDC", "HDC"],
 			1:[],
-			2:["HDC"],
+			2:["HDC", "HDC", "HDC"],
 			3:["HDC"]
 		},
 		2: {
@@ -99,11 +99,16 @@ $(document).ready(function(){
 		curX = x;
 		curY = y;
 		curCluster = index.cluster;
+		if (x % 2 == 0) {
+			toRight = true;
+		} else {
+			toRight = false;
+		}
 
 		removeStitchesAfter(getStitchY(x, y));
 		for (i in rows) {
 			if (i > x ) {
-				delete rows[x];
+				delete rows[i];
 			} else if (y == 0 && i == x) {
 				delete rows[x];
 				curX--;
@@ -165,27 +170,22 @@ $(document).ready(function(){
 	function parsePattern(x, y) {
 		var pattern = $("#interface").data("pattern");
 
-		var cluster = getClusterNum(x, y).cluster;
-
 		while (x in pattern) {
 			if (! (x in rows)) {
 				addRow();
 			}
-			while (cluster in pattern[x]) {
+			while (curCluster in pattern[x]) {
 				console.log("entering cluster")
-				if (pattern[x][cluster].length == 0) {
+				if (pattern[x][curCluster].length == 0) {
 					skipStitch();
 				} else {
-					for (var i=0; i < pattern[x][cluster].length; i++) {
-						addStitch(new Stitch(pattern[x][cluster][i]));
+					for (var i=0; i < pattern[x][curCluster].length; i++) {
+						addStitch(new Stitch(pattern[x][curCluster][i]));
 						console.log("stitch added");
 					}
 					addCluster();
 				}
-				cluster++;
 			}
-			y = 0;
-			cluster = 0;
 			x++;
 		}
 		curCluster--;

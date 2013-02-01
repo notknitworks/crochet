@@ -253,6 +253,24 @@
 		{% endif %}
 	{% endif %}
 
+	{% if pattern.user != request.user and user.is_authenticated %}
+		<button> Export </button>
+	{% endif %}
+
+	{% if pattern.user == request.user %}
+		<h1> My stitches </h1>
+		<ul>
+		{% for stitch in pattern.user.stitch_set.all %}
+			<li> {{stitch.name_short}} </li>
+		{% endfor %}
+		</ul>
+
+		{% if pattern.date_published == None %}
+			<button class="publishbutton" patternid="{{pattern.id}}"> Publish </button>
+		{% else %}
+			<button class="publishbutton" disabled> Already published </button>
+		{% endif %}
+	{% endif %}
 			</div>
 		</div>
 
@@ -292,24 +310,7 @@
 
 
 
-	{% if pattern.user != request.user and user.is_authenticated %}
-		<button> Export </button>
-	{% endif %}
 
-	{% if pattern.user == request.user %}
-		<h1> My stitches </h1>
-		<ul>
-		{% for stitch in pattern.user.stitch_set.all %}
-			<li> {{stitch.name_short}} </li>
-		{% endfor %}
-		</ul>
-
-		{% if pattern.date_published == None %}
-			<button class="publishbutton" patternid="{{pattern.id}}"> Publish </button>
-		{% else %}
-			<button class="publishbutton" disabled> Already published </button>
-		{% endif %}
-	{% endif %}
 	<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
 </body>
 </html>
