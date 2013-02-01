@@ -73,8 +73,8 @@ $(document).ready(function(){
 	$("#interface").data("pattern", testData);
 	parsePattern(0, 0);
 
-	editPattern("HDC", 2, 0, false);
-	editPattern("HDC", 2, 0, true);
+	// editPattern("HDC", 2, 0, false);
+	// editPattern("HDC", 2, 0, true);
 	// $(".pattern").load(function() {
 	// 		console.log("HI");
 	// 		$("#interface").data("pattern", $(this).attr("pattern"));

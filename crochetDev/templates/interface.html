@@ -6,6 +6,8 @@
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
   	<script src="{{STATIC_URL}}ui.js"></script>
   	<script src="{{STATIC_URL}}patternInput.js"></script>
+  	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}patternInput.css">
+
   	<style>
 		body{
 			background-color:#AFDAEF;
@@ -138,7 +140,7 @@
 			datajson = $("#interface").data("pattern");
 			var instructions = JSON.stringify(datajson);
 
-			$.getJSON("/saveinstructions/", {'patternid':button.attr('patternid'), 
+			$.getJSON("/saveinstructions/", {'patternid':button.attr('patternid'),
 				'instructions':instructions},
 
 				function(data){}
@@ -248,8 +250,16 @@
 	</div>
 
 	<div class="row">
-		<div class="span3">
+		<div class="span4">
 			<div class="nav nav-list">
+					<table id="patternTable">
+		<tr>
+			<td>Foundation:</td>
+			<td><div contenteditable="true" class="edit" id="r0" style="width:500px; border:1px solid black;"></div></td>
+			<td><button type="button" id="addRowButton">Add Row</button></td>
+			<td id="feedback"></td>
+		</tr>
+	</table>
 	<h3> {{pattern.name}} by {{pattern.user.username}} </h3>
 	<!-- must be viewing someone else's and logged in to have option to save -->
 	{% if pattern.user != request.user and user.is_authenticated %}
@@ -271,7 +281,7 @@
 	{% endif %}
 
 	{% if pattern.user == request.user %}
-		<h1> My stitches </h1>
+		<h3> My stitches </h3>
 		<ul>
 		{% for stitch in pattern.user.stitch_set.all %}
 			<li> {{stitch.name_short}} </li>
@@ -284,12 +294,14 @@
 			<button class="publishbutton" disabled> Already published </button>
 		{% endif %}
 	{% endif %}
+			<button type="button" class="btn btn-custom" id="saveinstructions" patternid="{{pattern.id}}"> Save </button>
+
 			</div>
+
 		</div>
 
 		<div class="span9">
 			<canvas id="interface" width="960" height="600"></canvas>
-			<button type="button" class="btn btn-custom" id="saveinstructions" patternid="{{pattern.id}}"> Save </button>
 
 
 

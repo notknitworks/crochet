@@ -43,6 +43,11 @@ var STITCH_IMGS = {
 $(function() {
 
     c = $("canvas")[0].getContext("2d");
+    c.save();
+    c.fillStyle = "white";
+    c.globalAlpha = 1.0;
+    c.fillRect(0, 0, $("canvas")[0].width, $("canvas")[0].height);
+    c.restore();
     c.fillStyle = "gray";
     c.globalAlpha = 0.5;
     cX = $("canvas").attr("width")/2;
